@@ -49,7 +49,7 @@
       gap: 12px;
     }
 
-    /* ヘッダー・ステータスバー */
+    /* ヘッダー */
     .header-bar {
       display: flex;
       justify-content: space-between;
@@ -92,7 +92,7 @@
       text-shadow: 1px 1px #000;
     }
 
-    /* メイン問題カード */
+    /* カードデザイン */
     .card {
       background-color: #3b352f;
       border: 3px solid var(--mc-border-dark);
@@ -106,6 +106,7 @@
       margin-bottom: 8px;
       display: flex;
       justify-content: space-between;
+      align-items: center;
     }
 
     .badge-grade {
@@ -134,7 +135,7 @@
       font-weight: bold;
     }
 
-    /* 手書き領域（2文字用 横長） */
+    /* 手書き領域 */
     .canvas-container {
       display: flex;
       flex-direction: column;
@@ -156,7 +157,7 @@
       gap: 8px;
     }
 
-    /* ボタンデザイン */
+    /* ボタン */
     .btn {
       background: #727272;
       border: 3px solid #000;
@@ -172,24 +173,12 @@
       gap: 6px;
     }
 
-    .btn:active {
-      box-shadow: inset 2px 2px 0 0 #373737, inset -2px -2px 0 0 #fff;
-    }
+    .btn:active { box-shadow: inset 2px 2px 0 0 #373737, inset -2px -2px 0 0 #fff; }
+    .btn-green { background: var(--mc-grass); }
+    .btn-gold { background: #c6a100; color: #000; }
+    .btn-danger { background: #a82a2a; }
 
-    .btn-green {
-      background: var(--mc-grass);
-    }
-
-    .btn-gold {
-      background: #c6a100;
-      color: #000;
-    }
-
-    .btn-danger {
-      background: #a82a2a;
-    }
-
-    /* 模範解答＆判定エリア */
+    /* 答えあわせパネル */
     .answer-panel {
       display: none;
       background: #25201b;
@@ -218,7 +207,28 @@
       gap: 16px;
     }
 
-    /* 保護者モーダル */
+    /* 日付タスクリスト */
+    .task-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    .task-item {
+      background: #211c18;
+      border: 2px solid var(--mc-border-light);
+      padding: 10px 14px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      cursor: pointer;
+    }
+
+    .task-item:hover { border-color: var(--mc-diamond); }
+    .task-item.completed { opacity: 0.5; cursor: default; border-color: #444; }
+
+    /* モーダル */
     .modal-overlay {
       display: none;
       position: fixed;
@@ -240,7 +250,7 @@
       overflow-y: auto;
     }
 
-    textarea, input[type="text"] {
+    textarea {
       width: 100%;
       background: #111;
       color: #fff;
@@ -262,8 +272,8 @@
       <span id="level-num" style="color:var(--mc-gold); font-size:20px;">1</span>
     </div>
     <div class="status-item">
-      <span>🔥 連続練習:</span>
-      <span id="streak-num" style="color:var(--mc-diamond);">1日</span>
+      <span>🔥 完了日数:</span>
+      <span id="streak-num" style="color:var(--mc-diamond);">0日</span>
     </div>
     <button class="btn" onclick="openAdmin()" style="font-size:12px; padding:4px 8px;">⚙️ 保護者設定</button>
   </div>
@@ -276,18 +286,26 @@
     </div>
   </div>
 
-  <!-- メイン問題表示 -->
-  <div class="card" id="main-card">
+  <!-- 日付選択画面 -->
+  <div class="card" id="select-card">
+    <h3 style="color:var(--mc-gold); margin-top:0;">📜 今日のドリルを選ぼう！</h3>
+    <p style="font-size:14px; color:#ccc;">やれていない日の課題（未完了）を選んで挑戦してね！</p>
+    <div class="task-list" id="task-list"></div>
+  </div>
+
+  <!-- メイン問題カード -->
+  <div class="card" id="main-card" style="display:none;">
     <div class="card-title">
-      <span id="q-number">第 1 / 10 問</span>
+      <div>
+        <button class="btn" onclick="showMenu()" style="font-size:10px; padding:2px 6px; margin-right:6px;">🔙 一覧へ</button>
+        <span id="q-number">第 1 / 10 問</span>
+      </div>
       <span id="q-grade" class="badge-grade">小学4年</span>
     </div>
 
-    <div class="question-box" id="q-sentence">
-      読み込み中...
-    </div>
+    <div class="question-box" id="q-sentence">読み込み中...</div>
 
-    <!-- 手書きキャンバス（2文字用 横長：320x160） -->
+    <!-- 手書きキャンバス -->
     <div class="canvas-container">
       <canvas id="handwrite-canvas" width="320" height="160"></canvas>
       <div class="canvas-tools">
@@ -296,7 +314,7 @@
       </div>
     </div>
 
-    <!-- 模範解答表示エリア -->
+    <!-- 模範解答エリア -->
     <div class="answer-panel" id="answer-panel">
       <div>正解（せいかい）:</div>
       <div class="answer-kanji" id="ans-kanji">召喚</div>
@@ -311,376 +329,20 @@
 
   <!-- クリア画面 -->
   <div class="card" id="clear-card" style="display:none; text-align:center;">
-    <h2 style="color:var(--mc-gold);">🎉 今日のドリル クリア！</h2>
-    <p>今日もマイクラ漢字ドリルを頑張ったね！</p>
-    <div style="font-size:48px; margin:16px 0;" id="reward-icon">💎</div>
-    <p id="clear-msg">経験値を獲得しました！明日もまた挑戦しよう！</p>
-    <button class="btn btn-green" onclick="location.reload()">もう一度プレイ</button>
+    <h2 style="color:var(--mc-gold);">🎉 クリアおめでとう！</h2>
+    <p id="clear-date-text">今日の課題をクリアしました！</p>
+    <div style="font-size:48px; margin:16px 0;">💎</div>
+    <p id="send-status" style="font-size:12px; color:var(--mc-diamond);">保護者へ学習記録を送信中...</p>
+    <button class="btn btn-green" onclick="showMenu()">ドリル一覧にもどる</button>
   </div>
 </div>
 
-<!-- 保護者管理用モーダル -->
+<!-- 保護者管理モーダル -->
 <div class="modal-overlay" id="admin-modal">
   <div class="modal">
     <h3>⚙️ 保護者用管理モード</h3>
     <p style="font-size:12px; color:#aaa;">職場で問題を追加したり、間違えた問題リストを確認できます。</p>
     
-    <h4>📌 間違えた問題リスト（優先出題されます）</h4>
-    <div id="wrong-list-box" style="background:#111; padding:8px; max-height:120px; overflow-y:auto; font-size:12px; margin-bottom:8px;">
-      なし
-    </div>
-    <button class="btn btn-danger" onclick="resetWrongList()" style="font-size:12px;">間違えたリストをリセット</button>
-
-    <hr style="border-color:var(--mc-border-light); margin:12px 0;">
-
-    <h4>➕ カスタム問題の追加</h4>
-    <p style="font-size:12px;">フォーマット: 学年(3か4),問題文(カッコ内に問題),正解の表記,読み</p>
-    <textarea id="custom-q-input" rows="3" placeholder="4,ネザーで(ショウカン)を行う,召喚,しょうかん"></textarea>
-    <button class="btn btn-green" onclick="addCustomQuestion()">問題を登録</button>
-
-    <div style="margin-top:16px; text-align:right;">
-      <button class="btn" onclick="closeAdmin()">とじる</button>
-    </div>
-  </div>
-</div>
-
-<script>
-// --- デフォルト問題データ（熟語・送り仮名入り） ---
-const DEFAULT_QUESTIONS_G4 = [
-  { grade: 4, sentence: "ネザーの儀式でモンスターを(ショウカン)する。", target: "ショウカン", answer: "召喚", reading: "しょうかん" },
-  { grade: 4, sentence: "村人とエメラルドの(コウカン)をする。", target: "コウカン", answer: "交換", reading: "こうかん" },
-  { grade: 4, sentence: "仲間と(キョウリョク)して巨大な城を建てる。", target: "キョウリョク", answer: "協力", reading: "きょうりょく" },
-  { grade: 4, sentence: "黒曜石を並べてゲートを(カンセイ)させる。", target: "カンセイ", answer: "完成", reading: "かんせい" },
-  { grade: 4, sentence: "鉄のツルハシで鉱石を(サイクツ)する。", target: "サイクツ", answer: "採掘", reading: "さいくつ" },
-  { grade: 4, sentence: "防具に(トクベツ)なエンチャントを付与する。", target: "トクベツ", answer: "特別", reading: "とくべつ" },
-  { grade: 4, sentence: "モンスターの攻撃を盾で(フセグ)。", target: "フセグ", answer: "防ぐ", reading: "ふせぐ" },
-  { grade: 4, sentence: "洞窟の奥深くを(サガル)と溶岩があった。", target: "サガル", answer: "下がる", reading: "さがる" },
-  { grade: 4, sentence: "新しいバイオームの(イチ)を特定する。", target: "イチ", answer: "位置", reading: "いち" },
-  { grade: 4, sentence: "危険なゾーンから(サチ)にも脱出できた。", target: "サチ", answer: "幸い", reading: "さいわい" },
-  { grade: 4, sentence: "レッドストーンで(ジドウ)ドアを作る。", target: "ジドウ", answer: "自動", reading: "じどう" },
-  { grade: 4, sentence: "探検の(ショトウ)となる拠点を築く。", target: "ショトウ", answer: "初頭", reading: "しょとう" },
-  { grade: 4, sentence: "ゾンビの群れを(タイジ)する。", target: "タイジ", answer: "退治", reading: "たいじ" },
-  { grade: 4, sentence: "新しい建築の(カイシ)を宣言する。", target: "カイシ", answer: "開始", reading: "かいし" },
-  { grade: 4, sentence: "水流を利用して(シュウカク)装置を作る。", target: "シュウカク", answer: "収穫", reading: "しゅうかく" }
-];
-
-const DEFAULT_QUESTIONS_G3 = [
-  { grade: 3, sentence: "作業台で(アタラシイ)ツールを作る。", target: "アタラシイ", answer: "新しい", reading: "あたらしい" },
-  { grade: 3, sentence: "採掘に必要な(ドウグ)を揃える。", target: "ドウグ", answer: "道具", reading: "どうぐ" },
-  { grade: 3, sentence: "夜になると(ワルイ)モンスターが出る。", target: "ワルイ", answer: "悪い", reading: "わるい" },
-  { grade: 3, sentence: "農場で小麦の(ハタケ)を作る。", target: "ハタケ", answer: "畑", reading: "はたけ" },
-  { grade: 3, sentence: "暗い洞窟に(ヒカリ)をともす。", target: "ヒカリ", answer: "光", reading: "ひかり" }
-];
-
-// --- アプリ状態管理 ---
-let appState = {
-  xp: 0,
-  level: 1,
-  streak: 1,
-  lastDate: "",
-  wrongQuestions: [],
-  customQuestions: []
-};
-
-let currentDailyQuestions = [];
-let currentIndex = 0;
-
-// --- サウンド効果 (Web Audio API) ---
-const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-function playSound(type) {
-  if (audioCtx.state === 'suspended') audioCtx.resume();
-  const osc = audioCtx.createOscillator();
-  const gain = audioCtx.createGain();
-  osc.connect(gain);
-  gain.connect(audioCtx.destination);
-
-  if (type === 'click') {
-    osc.frequency.setValueAtTime(400, audioCtx.currentTime);
-    osc.frequency.exponentialRampToValueAtTime(200, audioCtx.currentTime + 0.05);
-    gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
-    osc.start();
-    osc.stop(audioCtx.currentTime + 0.05);
-  } else if (type === 'correct') {
-    osc.frequency.setValueAtTime(523.25, audioCtx.currentTime); // C5
-    osc.frequency.setValueAtTime(659.25, audioCtx.currentTime + 0.1); // E5
-    gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
-    osc.start();
-    osc.stop(audioCtx.currentTime + 0.25);
-  } else if (type === 'wrong') {
-    osc.frequency.setValueAtTime(180, audioCtx.currentTime);
-    osc.frequency.setValueAtTime(110, audioCtx.currentTime + 0.15);
-    gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
-    osc.start();
-    osc.stop(audioCtx.currentTime + 0.25);
-  }
-}
-
-// --- 初期化処理 ---
-window.onload = function() {
-  loadData();
-  initCanvas();
-  setupDailyQuestions();
-  renderQuestion();
-  updateUI();
-};
-
-function loadData() {
-  const saved = localStorage.getItem('mc_kanji_data');
-  if (saved) {
-    appState = JSON.parse(saved);
-  }
-  const today = new Date().toDateString();
-  if (appState.lastDate && appState.lastDate !== today) {
-    const last = new Date(appState.lastDate);
-    const diff = (new Date() - last) / (1000 * 60 * 60 * 24);
-    if (diff > 1 && diff < 2) {
-      appState.streak += 1;
-    } else if (diff >= 2) {
-      appState.streak = 1;
-    }
-  }
-  appState.lastDate = today;
-  saveData();
-}
-
-function saveData() {
-  localStorage.setItem('mc_kanji_data', JSON.stringify(appState));
-}
-
-// --- 1日10問の出題ロジック ---
-function setupDailyQuestions() {
-  let questions = [];
-  
-  if (appState.wrongQuestions.length > 0) {
-    questions = [...appState.wrongQuestions];
-  }
-
-  let pool4 = [...DEFAULT_QUESTIONS_G4, ...appState.customQuestions.filter(q => q.grade == 4)];
-  pool4 = shuffleArray(pool4);
-  
-  for (let q of pool4) {
-    if (questions.length >= 9) break;
-    if (!questions.some(item => item.sentence === q.sentence)) {
-      questions.push(q);
-    }
-  }
-
-  let pool3 = [...DEFAULT_QUESTIONS_G3, ...appState.customQuestions.filter(q => q.grade == 3)];
-  pool3 = shuffleArray(pool3);
-  if (pool3.length > 0) {
-    questions.push(pool3[0]);
-  }
-
-  currentDailyQuestions = questions.slice(0, 10);
-}
-
-function shuffleArray(arr) {
-  return arr.sort(() => Math.random() - 0.5);
-}
-
-// --- 画面表示処理 ---
-function renderQuestion() {
-  if (currentIndex >= currentDailyQuestions.length) {
-    showClearScreen();
-    return;
-  }
-
-  const q = currentDailyQuestions[currentIndex];
-  document.getElementById('q-number').innerText = `第 ${currentIndex + 1} / ${currentDailyQuestions.length} 問`;
-  document.getElementById('q-grade').innerText = `小学${q.grade}年`;
-  
-  const formattedSentence = q.sentence.replace(/\((.*?)\)/, '<span class="target-word">$1</span>');
-  document.getElementById('q-sentence').innerHTML = formattedSentence;
-
-  document.getElementById('answer-panel').style.display = 'none';
-  document.getElementById('btn-check').style.display = 'inline-flex';
-  clearCanvas();
-}
-
-function showAnswer() {
-  playSound('click');
-  const q = currentDailyQuestions[currentIndex];
-  document.getElementById('ans-kanji').innerText = q.answer;
-  document.getElementById('ans-reading').innerText = `対象: ${q.target} （よみ: ${q.reading}）`;
-  document.getElementById('answer-panel').style.display = 'block';
-  document.getElementById('btn-check').style.display = 'none';
-}
-
-function evaluateResult(isCorrect) {
-  const q = currentDailyQuestions[currentIndex];
-
-  if (isCorrect) {
-    playSound('correct');
-    addXP(10);
-    appState.wrongQuestions = appState.wrongQuestions.filter(item => item.sentence !== q.sentence);
-  } else {
-    playSound('wrong');
-    if (!appState.wrongQuestions.some(item => item.sentence === q.sentence)) {
-      appState.wrongQuestions.push(q);
-    }
-  }
-  
-  saveData();
-  currentIndex++;
-  renderQuestion();
-}
-
-function addXP(amount) {
-  appState.xp += amount;
-  if (appState.xp >= 100) {
-    appState.level += 1;
-    appState.xp -= 100;
-  }
-  updateUI();
-}
-
-function updateUI() {
-  document.getElementById('level-num').innerText = appState.level;
-  document.getElementById('streak-num').innerText = `${appState.streak}日`;
-  document.getElementById('xp-fill').style.width = `${appState.xp}%`;
-  document.getElementById('xp-text').innerText = `${appState.xp} / 100 XP`;
-}
-
-function showClearScreen() {
-  document.getElementById('main-card').style.display = 'none';
-  document.getElementById('clear-card').style.display = 'block';
-  addXP(20);
-}
-
-// --- 手書きキャンバス機能（2文字・マス目ガイド表示） ---
-let canvas, ctx;
-let isDrawing = false;
-
-function initCanvas() {
-  canvas = document.getElementById('handwrite-canvas');
-  ctx = canvas.getContext('2d');
-  
-  canvas.addEventListener('mousedown', startDrawing);
-  canvas.addEventListener('mousemove', draw);
-  canvas.addEventListener('mouseup', stopDrawing);
-  canvas.addEventListener('mouseleave', stopDrawing);
-
-  canvas.addEventListener('touchstart', (e) => {
-    e.preventDefault();
-    const touch = e.touches[0];
-    const mouseEvent = new MouseEvent('mousedown', {
-      clientX: touch.clientX,
-      clientY: touch.clientY
-    });
-    canvas.dispatchEvent(mouseEvent);
-  });
-
-  canvas.addEventListener('touchmove', (e) => {
-    e.preventDefault();
-    const touch = e.touches[0];
-    const mouseEvent = new MouseEvent('mousemove', {
-      clientX: touch.clientX,
-      clientY: touch.clientY
-    });
-    canvas.dispatchEvent(mouseEvent);
-  });
-
-  canvas.addEventListener('touchend', (e) => {
-    const mouseEvent = new MouseEvent('mouseup', {});
-    canvas.dispatchEvent(mouseEvent);
-  });
-}
-
-function drawGrid() {
-  ctx.strokeStyle = '#e0e0e0';
-  ctx.lineWidth = 1;
-  ctx.setLineDash([4, 4]);
-
-  // 中央の縦仕切り（2文字用）
-  ctx.beginPath();
-  ctx.moveTo(160, 0); ctx.lineTo(160, 160);
-  ctx.stroke();
-
-  // マス目の十字ガイド
-  ctx.beginPath();
-  ctx.moveTo(80, 0); ctx.lineTo(80, 160);
-  ctx.moveTo(240, 0); ctx.lineTo(240, 160);
-  ctx.moveTo(0, 80); ctx.lineTo(320, 80);
-  ctx.stroke();
-
-  ctx.setLineDash([]); // 実線に戻す
-}
-
-function startDrawing(e) {
-  isDrawing = true;
-  ctx.beginPath();
-  const rect = canvas.getBoundingClientRect();
-  ctx.moveTo(e.clientX - rect.left, e.clientY - rect.top);
-  ctx.lineWidth = 6;
-  ctx.lineCap = 'round';
-  ctx.strokeStyle = '#222';
-}
-
-function draw(e) {
-  if (!isDrawing) return;
-  const rect = canvas.getBoundingClientRect();
-  ctx.lineTo(e.clientX - rect.left, e.clientY - rect.top);
-  ctx.stroke();
-}
-
-function stopDrawing() {
-  isDrawing = false;
-}
-
-function clearCanvas() {
-  if (ctx) {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    drawGrid();
-  }
-}
-
-// --- 保護者モーダル・管理機能 ---
-function openAdmin() {
-  document.getElementById('admin-modal').style.display = 'flex';
-  const box = document.getElementById('wrong-list-box');
-  if (appState.wrongQuestions.length === 0) {
-    box.innerText = "現在、復習待ちの問題はありません。";
-  } else {
-    box.innerHTML = appState.wrongQuestions.map(q => `• [小${q.grade}] ${q.sentence} (${q.answer})`).join('<br>');
-  }
-}
-
-function closeAdmin() {
-  document.getElementById('admin-modal').style.display = 'none';
-}
-
-function resetWrongList() {
-  if (confirm("間違えた問題リストをクリアしますか？")) {
-    appState.wrongQuestions = [];
-    saveData();
-    openAdmin();
-  }
-}
-
-function addCustomQuestion() {
-  const input = document.getElementById('custom-q-input').value.trim();
-  if (!input) return;
-  
-  const parts = input.split(',');
-  if (parts.length < 4) {
-    alert("カンマ区切りで4つの項目を入力してください。");
-    return;
-  }
-
-  const newQ = {
-    grade: parseInt(parts[0].trim()),
-    sentence: parts[1].trim(),
-    target: parts[2].trim(),
-    answer: parts[2].trim(),
-    reading: parts[3].trim()
-  };
-
-  appState.customQuestions.push(newQ);
-  saveData();
-  alert("新しい問題を追加しました！");
-  document.getElementById('custom-q-input').value = "";
-}
-</script>
-
-</body>
-</html>
+    <h4>📌 復習待ちの問題リスト（優先出題されます）</h4>
+    <div id="wrong-list-box" style="background:#111; padding:8px; max-height:120px; overflow-y:auto; font-size:12px; margin-bottom:8px;">なし</div>
+    <button class="btn btn-danger" onclick="resetWrongList()"
