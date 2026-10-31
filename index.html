@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>マイクラ漢字ドリル - 小4・小3復習</title>
+  <!-- Google Fonts: VT323 & Press Start 2P for Minecraft Vibe -->
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=DotGothic16&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --mc-dirt: #866043;
+      --mc-grass-top: #5c8e32;
+      --mc-stone: #737373;
+      --mc-wood: #9c6e49;
+      --mc-diamond: #4bedd2;
+      --mc-gold: #fdf55f;
+      --mc-redstone: #ff2200;
+      --mc-dark-bg: #1e1e24;
+      --mc-panel-bg: #c6c6c6;
+      --mc-border-light: #ffffff;
+      --mc-border-dark: #555555;
+    }
+
+    * {
+      box-sizing: border-box;
+      user-select: none;
+      -webkit-user-select: none;
+      touch-action: manipulation;
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      background-color: #121216;
+      background-image: 
+        radial-gradient(#262633 15%, transparent 16%),
+        radial-gradient(#262633 15%, transparent 16%);
+      background-size: 30px 30px;
+      background-position: 0 0, 15px 15px;
+      color: #fff;
+      font-family: 'DotGothic16', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      padding: 10px;
+    }
+
+    /* Minecraft GUI Frame Container */
+    .mc-container {
+      background: var(--mc-panel-bg);
+      border: 4px solid #000;
+      box-shadow: 
+        inset -4px -4px 0px 0px var(--mc-border-dark),
+        inset 4px 4px 0px 0px var(--mc-border-light);
+      color: #373737;
+      width: 100%;
+      max-width: 650px;
+      padding: 16px;
+      margin-top: 10px
