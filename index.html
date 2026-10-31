@@ -8,22 +8,16 @@
     @import url('https://fonts.googleapis.com/css2?family=DotGothic16&display=swap');
 
     :root {
-      --mc-dirt: #5c4033;
-      --mc-grass: #4a7c29;
-      --mc-stone: #737373;
-      --mc-wood: #866043;
-      --mc-diamond: #4cedd9;
-      --mc-gold: #fdf55f;
       --mc-dark-bg: #1e1b18;
       --mc-panel: #312b26;
       --mc-border-light: #494038;
       --mc-border-dark: #191613;
+      --mc-grass: #4a7c29;
+      --mc-gold: #fdf55f;
+      --mc-diamond: #4cedd9;
     }
 
-    * {
-      box-sizing: border-box;
-      user-select: none;
-    }
+    * { box-sizing: border-box; user-select: none; }
 
     body {
       margin: 0;
@@ -42,79 +36,25 @@
       max-width: 720px;
       background-color: var(--mc-panel);
       border: 4px solid var(--mc-border-dark);
-      box-shadow: inset -4px -4px 0px 0px var(--mc-border-dark), inset 4px 4px 0px 0px var(--mc-border-light);
       padding: 16px;
       display: flex;
       flex-direction: column;
       gap: 12px;
     }
 
-    /* ヘッダー */
     .header-bar {
       display: flex;
       justify-content: space-between;
       align-items: center;
       background-color: #211c18;
-      padding: 10px 14px;
+      padding: 10px;
       border: 2px solid var(--mc-border-dark);
     }
 
-    .status-item {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      font-size: 16px;
-    }
-
-    .xp-bar-container {
-      background: #111;
-      border: 2px solid #000;
-      height: 16px;
-      width: 100%;
-      position: relative;
-      margin-top: 4px;
-    }
-
-    .xp-bar-fill {
-      background: #55ff55;
-      height: 100%;
-      width: 0%;
-      transition: width 0.3s;
-    }
-
-    .xp-text {
-      position: absolute;
-      top: -2px;
-      width: 100%;
-      text-align: center;
-      font-size: 12px;
-      color: #fff;
-      text-shadow: 1px 1px #000;
-    }
-
-    /* カードデザイン */
     .card {
       background-color: #3b352f;
       border: 3px solid var(--mc-border-dark);
       padding: 16px;
-      position: relative;
-    }
-
-    .card-title {
-      font-size: 14px;
-      color: var(--mc-diamond);
-      margin-bottom: 8px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .badge-grade {
-      background: var(--mc-grass);
-      padding: 2px 6px;
-      border-radius: 2px;
-      color: #fff;
-      font-size: 12px;
     }
 
     .question-box {
@@ -124,61 +64,46 @@
       background: #28231e;
       padding: 12px;
       border: 2px solid #1a1714;
-      min-height: 70px;
-      word-break: break-all;
     }
 
     .target-word {
       color: var(--mc-gold);
       border-bottom: 3px dashed var(--mc-gold);
-      padding: 0 4px;
       font-weight: bold;
-    }
-
-    /* 手書き領域 */
-    .canvas-container {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 8px;
-      margin: 10px 0;
     }
 
     canvas {
       background: #ffffff;
-      border: 4px solid var(--mc-wood);
+      border: 4px solid #866043;
       touch-action: none;
       cursor: crosshair;
       border-radius: 4px;
     }
 
-    .canvas-tools {
-      display: flex;
-      gap: 8px;
-    }
-
-    /* ボタン */
     .btn {
       background: #727272;
       border: 3px solid #000;
-      box-shadow: inset -2px -2px 0 0 #373737, inset 2px 2px 0 0 #fff;
       color: #fff;
       padding: 8px 16px;
       font-family: 'DotGothic16', monospace;
       font-size: 16px;
       cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 6px;
     }
 
-    .btn:active { box-shadow: inset 2px 2px 0 0 #373737, inset -2px -2px 0 0 #fff; }
     .btn-green { background: var(--mc-grass); }
     .btn-gold { background: #c6a100; color: #000; }
     .btn-danger { background: #a82a2a; }
 
-    /* 答えあわせパネル */
+    .task-item {
+      background: #211c18;
+      border: 2px solid var(--mc-border-light);
+      padding: 12px;
+      margin-bottom: 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
     .answer-panel {
       display: none;
       background: #25201b;
@@ -192,38 +117,314 @@
       font-size: 56px;
       color: var(--mc-gold);
       margin: 4px 0;
-      letter-spacing: 4px;
     }
+  </style>
+</head>
+<body>
 
-    .answer-detail {
-      font-size: 15px;
-      color: #ccc;
-      margin-bottom: 12px;
+<div class="app-container">
+  <!-- ヘッダー -->
+  <div class="header-bar">
+    <div>⛏️ LEVEL: <span id="level-num" style="color:var(--mc-gold);">1</span></div>
+    <div>🔥 完了日数: <span id="streak-num" style="color:var(--mc-diamond);">0日</span></div>
+  </div>
+
+  <!-- エラー警告表示エリア（問題発生時用） -->
+  <div id="error-box" style="display:none; background:#a82a2a; padding:10px; border:2px solid #fff; font-size:12px;"></div>
+
+  <!-- 日付選択画面 -->
+  <div class="card" id="select-card">
+    <h3 style="color:var(--mc-gold); margin:0 0 8px 0;">📜 今日のドリルを選ぼう！</h3>
+    <p style="font-size:14px; color:#ccc; margin:0 0 12px 0;">10月31日(土)スタート！未完了の日の課題を選んでね！</p>
+    <div id="task-list"></div>
+  </div>
+
+  <!-- 問題カード -->
+  <div class="card" id="main-card" style="display:none;">
+    <div style="display:flex; justify-content:space-between; align-items:center;">
+      <button class="btn" onclick="showMenu()" style="font-size:10px; padding:2px 6px;">🔙 一覧へ</button>
+      <span id="q-number">第 1 / 10 問</span>
+    </div>
+
+    <div class="question-box" id="q-sentence">読み込み中...</div>
+
+    <!-- キャンバス -->
+    <div style="text-align:center; margin:10px 0;">
+      <canvas id="handwrite-canvas" width="320" height="160"></canvas>
+      <div style="margin-top:8px;">
+        <button class="btn" onclick="clearCanvas()">🧼 けす</button>
+        <button class="btn btn-gold" id="btn-check" onclick="showAnswer()">🔍 答えあわせ</button>
+      </div>
+    </div>
+
+    <!-- 答えあわせ -->
+    <div class="answer-panel" id="answer-panel">
+      <div>正解（せいかい）:</div>
+      <div class="answer-kanji" id="ans-kanji">召喚</div>
+      <div id="ans-reading" style="font-size:14px; color:#ccc; margin-bottom:8px;"></div>
+      <div style="display:flex; justify-content:center; gap:12px;">
+        <button class="btn btn-green" onclick="evaluateResult(true)">⭕ 書けた！</button>
+        <button class="btn btn-danger" onclick="evaluateResult(false)">❌ 書けなかった</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- クリア画面 -->
+  <div class="card" id="clear-card" style="display:none; text-align:center;">
+    <h2 style="color:var(--mc-gold);">🎉 クリアおめでとう！</h2>
+    <p id="clear-date-text"></p>
+    <div style="font-size:48px; margin:16px 0;">💎</div>
+    <p id="send-status" style="font-size:12px; color:var(--mc-diamond);"></p>
+    <button class="btn btn-green" onclick="showMenu()">ドリル一覧にもどる</button>
+  </div>
+</div>
+
+<script>
+// エラーキャッチ機能（画面が真っ暗になるのを防止）
+window.onerror = function(msg, url, line) {
+  const errBox = document.getElementById('error-box');
+  if (errBox) {
+    errBox.style.display = 'block';
+    errBox.innerText = 'エラーが発生しました: ' + msg + ' (L' + line + ')';
+  }
+  return false;
+};
+
+const GOOGLE_SHEET_URL = "https://script.google.com/macros/s/AKfycbyU9y0O5XWXg9QJZ8FvzgY9iV0HTA1pwe7fydhLA8iCHPCYfzJtPkmupEZwK24NZBsW/exec";
+
+const DEFAULT_QUESTIONS = [
+  { grade: 4, sentence: "ネザーの儀式でモンスターを(ショウカン)する。", target: "ショウカン", answer: "召喚", reading: "しょうかん" },
+  { grade: 4, sentence: "村人とエメラルドの(コウカン)をする。", target: "コウカン", answer: "交換", reading: "こうかん" },
+  { grade: 4, sentence: "仲間と(キョウリョク)して巨大な城を建てる。", target: "キョウリョク", answer: "協力", reading: "きょうりょく" },
+  { grade: 4, sentence: "黒曜石を並べてゲートを(カンセイ)させる。", target: "カンセイ", answer: "完成", reading: "かんせい" },
+  { grade: 4, sentence: "鉄のツルハシで鉱石を(サイクツ)する。", target: "サイクツ", answer: "採掘", reading: "さいくつ" },
+  { grade: 4, sentence: "防具に(トクベツ)なエンチャントを付与する。", target: "トクベツ", answer: "特別", reading: "とくべつ" },
+  { grade: 4, sentence: "モンスターの攻撃を盾で(フセグ)。", target: "フセグ", answer: "防ぐ", reading: "ふせぐ" },
+  { grade: 4, sentence: "洞窟の奥深くを(サガル)と溶岩があった。", target: "サガル", answer: "下がる", reading: "さがる" },
+  { grade: 4, sentence: "新しいバイオームの(イチ)を特定する。", target: "イチ", answer: "位置", reading: "いち" },
+  { grade: 3, sentence: "作業台で(アタラシイ)ツールを作る。", target: "アタラシイ", answer: "新しい", reading: "あたらしい" }
+];
+
+let appState = { xp: 0, level: 1, completedDates: [], wrongQuestions: [] };
+let selectedDateStr = "";
+let currentQuestions = [];
+let currentIndex = 0;
+let sessionCorrectCount = 0;
+let sessionWrongList = [];
+
+window.onload = function() {
+  try {
+    const saved = localStorage.getItem('mc_kanji_simple_v1');
+    if (saved) appState = JSON.parse(saved);
+  } catch(e) {}
+  
+  initCanvas();
+  renderTaskList();
+  updateUI();
+};
+
+function saveData() {
+  try {
+    localStorage.setItem('mc_kanji_simple_v1', JSON.stringify(appState));
+  } catch(e) {}
+}
+
+function renderTaskList() {
+  const container = document.getElementById('task-list');
+  container.innerHTML = "";
+
+  // 10月31日から今日までの日付を表示
+  const dates = ["2026-10-31"];
+  const today = new Date();
+  const year = today.getFullYear();
+  const month = String(today.getMonth() + 1).padStart(2, '0');
+  const day = String(today.getDate()).padStart(2, '0');
+  const todayStr = `${year}-${month}-${day}`;
+  
+  if (!dates.includes(todayStr)) {
+    dates.unshift(todayStr);
+  }
+
+  dates.forEach(dStr => {
+    const isDone = appState.completedDates.includes(dStr);
+    const item = document.createElement('div');
+    item.className = 'task-item';
+    
+    item.innerHTML = `
+      <div>📅 <strong>${dStr} のドリル</strong></div>
+      <div>${isDone ? '✅ 完了' : `<button class="btn btn-green" onclick="startDrill('${dStr}')">▶ 挑戦する</button>`}</div>
+    `;
+    container.appendChild(item);
+  });
+}
+
+function startDrill(dateStr) {
+  selectedDateStr = dateStr;
+  currentIndex = 0;
+  sessionCorrectCount = 0;
+  sessionWrongList = [];
+
+  // 間違えた問題＋デフォルト問題
+  let pool = [...DEFAULT_QUESTIONS];
+  if (appState.wrongQuestions && appState.wrongQuestions.length > 0) {
+    pool = [...appState.wrongQuestions, ...pool];
+  }
+
+  // 重複除去して10問セット
+  currentQuestions = [];
+  pool.forEach(q => {
+    if (currentQuestions.length < 10 && !currentQuestions.some(x => x.sentence === q.sentence)) {
+      currentQuestions.push(q);
     }
+  });
 
-    .eval-buttons {
-      display: flex;
-      justify-content: center;
-      gap: 16px;
+  document.getElementById('select-card').style.display = 'none';
+  document.getElementById('main-card').style.display = 'block';
+  renderQuestion();
+}
+
+function showMenu() {
+  document.getElementById('main-card').style.display = 'none';
+  document.getElementById('clear-card').style.display = 'none';
+  document.getElementById('select-card').style.display = 'block';
+  renderTaskList();
+}
+
+function renderQuestion() {
+  if (currentIndex >= currentQuestions.length) {
+    finishDrill();
+    return;
+  }
+
+  const q = currentQuestions[currentIndex];
+  document.getElementById('q-number').innerText = `第 ${currentIndex + 1} / ${currentQuestions.length} 問`;
+  document.getElementById('q-sentence').innerHTML = q.sentence.replace(/\((.*?)\)/, '<span class="target-word">$1</span>');
+  document.getElementById('answer-panel').style.display = 'none';
+  document.getElementById('btn-check').style.display = 'inline-block';
+  clearCanvas();
+}
+
+function showAnswer() {
+  const q = currentQuestions[currentIndex];
+  document.getElementById('ans-kanji').innerText = q.answer;
+  document.getElementById('ans-reading').innerText = `よみ: ${q.reading}`;
+  document.getElementById('answer-panel').style.display = 'block';
+  document.getElementById('btn-check').style.display = 'none';
+}
+
+function evaluateResult(isCorrect) {
+  const q = currentQuestions[currentIndex];
+  if (isCorrect) {
+    sessionCorrectCount++;
+    if (appState.wrongQuestions) {
+      appState.wrongQuestions = appState.wrongQuestions.filter(x => x.sentence !== q.sentence);
     }
-
-    /* 日付タスクリスト */
-    .task-list {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      margin-top: 12px;
-      max-height: 320px;
-      overflow-y: auto;
+  } else {
+    sessionWrongList.push(q.answer);
+    if (!appState.wrongQuestions) appState.wrongQuestions = [];
+    if (!appState.wrongQuestions.some(x => x.sentence === q.sentence)) {
+      appState.wrongQuestions.push(q);
     }
+  }
+  saveData();
+  currentIndex++;
+  renderQuestion();
+}
 
-    .task-item {
-      background: #211c18;
-      border: 2px solid var(--mc-border-light);
-      padding: 12px 16px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
+function updateUI() {
+  document.getElementById('level-num').innerText = appState.level || 1;
+  document.getElementById('streak-num').innerText = `${appState.completedDates ? appState.completedDates.length : 0}日`;
+}
 
-    .task-item.
+function finishDrill() {
+  document.getElementById('main-card').style.display = 'none';
+  document.getElementById('clear-card').style.display = 'block';
+  document.getElementById('clear-date-text').innerText = `${selectedDateStr} のドリル完了！`;
+
+  if (!appState.completedDates.includes(selectedDateStr)) {
+    appState.completedDates.push(selectedDateStr);
+    saveData();
+  }
+  updateUI();
+  sendResultToSheet();
+}
+
+function sendResultToSheet() {
+  const statusElem = document.getElementById('send-status');
+  statusElem.innerText = "学習記録を送信中...";
+  
+  const payload = {
+    dateStr: selectedDateStr,
+    score: sessionCorrectCount,
+    total: currentQuestions.length,
+    wrongList: sessionWrongList
+  };
+
+  fetch(GOOGLE_SHEET_URL, {
+    method: 'POST',
+    mode: 'no-cors',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload)
+  }).then(() => {
+    statusElem.innerText = "✅ スプレッドシートへ送信完了！";
+  }).catch(() => {
+    statusElem.innerText = "⚠️ 送信できませんでした。";
+  });
+}
+
+// キャンバス処理
+let canvas, ctx, isDrawing = false;
+function initCanvas() {
+  canvas = document.getElementById('handwrite-canvas');
+  if (!canvas) return;
+  ctx = canvas.getContext('2d');
+  
+  canvas.addEventListener('mousedown', startDrawing);
+  canvas.addEventListener('mousemove', draw);
+  canvas.addEventListener('mouseup', stopDrawing);
+
+  canvas.addEventListener('touchstart', (e) => {
+    e.preventDefault();
+    const t = e.touches[0];
+    startDrawing({ clientX: t.clientX, clientY: t.clientY });
+  });
+  canvas.addEventListener('touchmove', (e) => {
+    e.preventDefault();
+    const t = e.touches[0];
+    draw({ clientX: t.clientX, clientY: t.clientY });
+  });
+  canvas.addEventListener('touchend', stopDrawing);
+}
+
+function startDrawing(e) {
+  isDrawing = true;
+  ctx.beginPath();
+  const rect = canvas.getBoundingClientRect();
+  ctx.moveTo(e.clientX - rect.left, e.clientY - rect.top);
+  ctx.lineWidth = 6;
+  ctx.lineCap = 'round';
+  ctx.strokeStyle = '#222';
+}
+
+function draw(e) {
+  if (!isDrawing) return;
+  const rect = canvas.getBoundingClientRect();
+  ctx.lineTo(e.clientX - rect.left, e.clientY - rect.top);
+  ctx.stroke();
+}
+
+function stopDrawing() { isDrawing = false; }
+
+function clearCanvas() {
+  if (!ctx) return;
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  ctx.strokeStyle = '#e0e0e0';
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.moveTo(160, 0); ctx.lineTo(160, 160);
+  ctx.stroke();
+}
+</script>
+
+</body>
+</html>
