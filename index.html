@@ -213,6 +213,8 @@
       flex-direction: column;
       gap: 8px;
       margin-top: 12px;
+      max-height: 320px;
+      overflow-y: auto;
     }
 
     .task-item {
@@ -289,7 +291,7 @@
   <!-- 日付選択画面 -->
   <div class="card" id="select-card">
     <h3 style="color:var(--mc-gold); margin-top:0;">📜 今日のドリルを選ぼう！</h3>
-    <p style="font-size:14px; color:#ccc;">やれていない日の課題（未完了）を選んで挑戦してね！</p>
+    <p style="font-size:14px; color:#ccc;">10月31日(土)スタート！未完了の日の課題を選んでね！</p>
     <div class="task-list" id="task-list"></div>
   </div>
 
@@ -345,4 +347,354 @@
     
     <h4>📌 復習待ちの問題リスト（優先出題されます）</h4>
     <div id="wrong-list-box" style="background:#111; padding:8px; max-height:120px; overflow-y:auto; font-size:12px; margin-bottom:8px;">なし</div>
-    <button class="btn btn-danger" onclick="resetWrongList()"
+    <button class="btn btn-danger" onclick="resetWrongList()" style="font-size:12px;">間違えたリストをリセット</button>
+
+    <hr style="border-color:var(--mc-border-light); margin:12px 0;">
+
+    <h4>➕ カスタム問題の追加</h4>
+    <p style="font-size:12px;">フォーマット: 学年(3か4),問題文(カッコ内に問題),正解表記,読み</p>
+    <textarea id="custom-q-input" rows="3" placeholder="4,ネザーで(ショウカン)を行う,召喚,しょうかん"></textarea>
+    <button class="btn btn-green" onclick="addCustomQuestion()">問題を登録</button>
+
+    <div style="margin-top:16px; text-align:right;">
+      <button class="btn" onclick="closeAdmin()">とじる</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// 設定済みのGoogle Apps Script URL
+const GOOGLE_SHEET_URL = "https://script.google.com/macros/s/AKfycbyU9y0O5XWXg9QJZ8FvzgY9iV0HTA1pwe7fydhLA8iCHPCYfzJtPkmupEZwK24NZBsW/exec";
+
+// 開始起点日: 2026年10月31日
+const START_DATE_STR = "2026-10-31";
+
+// --- 問題データ（熟語・送り仮名入り） ---
+const DEFAULT_QUESTIONS_G4 = [
+  { grade: 4, sentence: "ネザーの儀式でモンスターを(ショウカン)する。", target: "ショウカン", answer: "召喚", reading: "しょうかん" },
+  { grade: 4, sentence: "村人とエメラルドの(コウカン)をする。", target: "コウカン", answer: "交換", reading: "こうかん" },
+  { grade: 4, sentence: "仲間と(キョウリョク)して巨大な城を建てる。", target: "キョウリョク", answer: "協力", reading: "きょうりょく" },
+  { grade: 4, sentence: "黒曜石を並べてゲートを(カンセイ)させる。", target: "カンセイ", answer: "完成", reading: "かんせい" },
+  { grade: 4, sentence: "鉄のツルハシで鉱石を(サイクツ)する。", target: "サイクツ", answer: "採掘", reading: "さいくつ" },
+  { grade: 4, sentence: "防具に(トクベツ)なエンチャントを付与する。", target: "トクベツ", answer: "特別", reading: "とくべつ" },
+  { grade: 4, sentence: "モンスターの攻撃を盾で(フセグ)。", target: "フセグ", answer: "防ぐ", reading: "ふせぐ" },
+  { grade: 4, sentence: "洞窟の奥深くを(サガル)と溶岩があった。", target: "サガル", answer: "下がる", reading: "さがる" },
+  { grade: 4, sentence: "新しいバイオームの(イチ)を特定する。", target: "イチ", answer: "位置", reading: "いち" },
+  { grade: 4, sentence: "危険なゾーンから(サチ)にも脱出できた。", target: "サチ", answer: "幸い", reading: "さいわい" },
+  { grade: 4, sentence: "レッドストーンで(ジドウ)ドアを作る。", target: "ジドウ", answer: "自動", reading: "じどう" },
+  { grade: 4, sentence: "探検の(ショトウ)となる拠点を築く。", target: "ショトウ", answer: "初頭", reading: "しょとう" },
+  { grade: 4, sentence: "ゾンビの群れを(タイジ)する。", target: "タイジ", answer: "退治", reading: "たいじ" },
+  { grade: 4, sentence: "新しい建築の(カイシ)を宣言する。", target: "カイシ", answer: "開始", reading: "かいし" },
+  { grade: 4, sentence: "水流を利用して(シュウカク)装置を作る。", target: "シュウカク", answer: "収穫", reading: "しゅうかく" }
+];
+
+const DEFAULT_QUESTIONS_G3 = [
+  { grade: 3, sentence: "作業台で(アタラシイ)ツールを作る。", target: "アタラシイ", answer: "新しい", reading: "あたらしい" },
+  { grade: 3, sentence: "採掘に必要な(ドウグ)を揃える。", target: "ドウグ", answer: "道具", reading: "どうぐ" },
+  { grade: 3, sentence: "夜になると(ワルイ)モンスターが出る。", target: "ワルイ", answer: "悪い", reading: "わるい" },
+  { grade: 3, sentence: "農場で小麦の(ハタケ)を作る。", target: "ハタケ", answer: "畑", reading: "はたけ" },
+  { grade: 3, sentence: "暗い洞窟に(ヒカリ)をともす。", target: "ヒカリ", answer: "光", reading: "ひかり" }
+];
+
+// --- アプリ状態管理 ---
+let appState = {
+  xp: 0,
+  level: 1,
+  completedDates: [],
+  wrongQuestions: [],
+  customQuestions: []
+};
+
+let selectedDateStr = "";
+let currentQuestions = [];
+let currentIndex = 0;
+let sessionCorrectCount = 0;
+let sessionWrongList = [];
+
+// --- サウンド効果 ---
+const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+function playSound(type) {
+  if (audioCtx.state === 'suspended') audioCtx.resume();
+  const osc = audioCtx.createOscillator();
+  const gain = audioCtx.createGain();
+  osc.connect(gain);
+  gain.connect(audioCtx.destination);
+
+  if (type === 'click') {
+    osc.frequency.setValueAtTime(400, audioCtx.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(200, audioCtx.currentTime + 0.05);
+    gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+    osc.start();
+    osc.stop(audioCtx.currentTime + 0.05);
+  } else if (type === 'correct') {
+    osc.frequency.setValueAtTime(523.25, audioCtx.currentTime);
+    osc.frequency.setValueAtTime(659.25, audioCtx.currentTime + 0.1);
+    gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
+    osc.start();
+    osc.stop(audioCtx.currentTime + 0.25);
+  } else if (type === 'wrong') {
+    osc.frequency.setValueAtTime(180, audioCtx.currentTime);
+    osc.frequency.setValueAtTime(110, audioCtx.currentTime + 0.15);
+    gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+    osc.start();
+    osc.stop(audioCtx.currentTime + 0.25);
+  }
+}
+
+// --- 初期化 ---
+window.onload = function() {
+  loadData();
+  initCanvas();
+  renderTaskList();
+  updateUI();
+};
+
+function loadData() {
+  const saved = localStorage.getItem('mc_kanji_data_v4');
+  if (saved) {
+    appState = JSON.parse(saved);
+  }
+  saveData();
+}
+
+function saveData() {
+  localStorage.setItem('mc_kanji_data_v4', JSON.stringify(appState));
+}
+
+// --- 日付タスクリスト自動生成（2026-10-31 起点） ---
+function renderTaskList() {
+  const container = document.getElementById('task-list');
+  container.innerHTML = "";
+
+  const dates = getGeneratedDatesList();
+  dates.forEach(dStr => {
+    const isDone = appState.completedDates.includes(dStr);
+    const item = document.createElement('div');
+    item.className = `task-item ${isDone ? 'completed' : ''}`;
+    
+    // 曜日計算
+    const dateObj = new Date(dStr);
+    const dayOfWeek = ["日","月","火","水","木","金","土"][dateObj.getDay()];
+
+    item.innerHTML = `
+      <div>📅 <strong>${dStr} (${dayOfWeek}) のドリル</strong></div>
+      <div>${isDone ? '✅ 完了済み' : '▶ 挑戦する'}</div>
+    `;
+    if (!isDone) {
+      item.onclick = () => startDrill(dStr);
+    }
+    container.appendChild(item);
+  });
+}
+
+function getGeneratedDatesList() {
+  const list = [];
+  const startDate = new Date(START_DATE_STR);
+  const today = new Date();
+  
+  // 開始日から今日（または現在）までの日付をすべて列挙
+  let current = new Date(startDate);
+  while (current <= today || list.length === 0) {
+    const year = current.getFullYear();
+    const month = String(current.getMonth() + 1).padStart(2, '0');
+    const day = String(current.getDate()).padStart(2, '0');
+    list.push(`${year}-${month}-${day}`);
+    
+    current.setDate(current.getDate() + 1);
+  }
+  return list.reverse(); // 新しい日付を上に表示
+}
+
+// 日付文字列から確定数値シードを生成（問題のランダム固定用）
+function getSeedFromDate(dateStr) {
+  let hash = 0;
+  for (let i = 0; i < dateStr.length; i++) {
+    hash = dateStr.charCodeAt(i) + ((hash << 5) - hash);
+  }
+  return Math.abs(hash);
+}
+
+function seededShuffle(arr, seed) {
+  let array = [...arr];
+  let m = array.length, t, i;
+  while (m) {
+    i = Math.floor(seededRandom(seed++) * m--);
+    t = array[m];
+    array[m] = array[i];
+    array[i] = t;
+  }
+  return array;
+}
+
+function seededRandom(seed) {
+  let x = Math.sin(seed++) * 10000;
+  return x - Math.floor(x);
+}
+
+function startDrill(dateStr) {
+  playSound('click');
+  selectedDateStr = dateStr;
+  currentIndex = 0;
+  sessionCorrectCount = 0;
+  sessionWrongList = [];
+
+  const seed = getSeedFromDate(dateStr);
+
+  let questions = [];
+  // 1. 復習待ち（間違えた問題）を最優先挿入
+  if (appState.wrongQuestions.length > 0) {
+    questions = [...appState.wrongQuestions];
+  }
+
+  // 2. 日付固有の乱数シードで4年生問題をシャッフルして補填
+  let pool4 = seededShuffle([...DEFAULT_QUESTIONS_G4, ...appState.customQuestions.filter(q => q.grade == 4)], seed);
+  for (let q of pool4) {
+    if (questions.length >= 9) break;
+    if (!questions.some(item => item.sentence === q.sentence)) {
+      questions.push(q);
+    }
+  }
+
+  // 3. 3年生復習問題（1問）
+  let pool3 = seededShuffle([...DEFAULT_QUESTIONS_G3, ...appState.customQuestions.filter(q => q.grade == 3)], seed + 1);
+  if (pool3.length > 0) questions.push(pool3[0]);
+
+  currentQuestions = questions.slice(0, 10);
+
+  document.getElementById('select-card').style.display = 'none';
+  document.getElementById('main-card').style.display = 'block';
+  renderQuestion();
+}
+
+function showMenu() {
+  playSound('click');
+  document.getElementById('main-card').style.display = 'none';
+  document.getElementById('clear-card').style.display = 'none';
+  document.getElementById('select-card').style.display = 'block';
+  renderTaskList();
+}
+
+// --- 問題表示＆判定 ---
+function renderQuestion() {
+  if (currentIndex >= currentQuestions.length) {
+    finishDrill();
+    return;
+  }
+
+  const q = currentQuestions[currentIndex];
+  document.getElementById('q-number').innerText = `第 ${currentIndex + 1} / ${currentQuestions.length} 問`;
+  document.getElementById('q-grade').innerText = `小学${q.grade}年`;
+  
+  const formattedSentence = q.sentence.replace(/\((.*?)\)/, '<span class="target-word">$1</span>');
+  document.getElementById('q-sentence').innerHTML = formattedSentence;
+
+  document.getElementById('answer-panel').style.display = 'none';
+  document.getElementById('btn-check').style.display = 'inline-flex';
+  clearCanvas();
+}
+
+function showAnswer() {
+  playSound('click');
+  const q = currentQuestions[currentIndex];
+  document.getElementById('ans-kanji').innerText = q.answer;
+  document.getElementById('ans-reading').innerText = `対象: ${q.target} （よみ: ${q.reading}）`;
+  document.getElementById('answer-panel').style.display = 'block';
+  document.getElementById('btn-check').style.display = 'none';
+}
+
+function evaluateResult(isCorrect) {
+  const q = currentQuestions[currentIndex];
+
+  if (isCorrect) {
+    playSound('correct');
+    addXP(10);
+    sessionCorrectCount++;
+    appState.wrongQuestions = appState.wrongQuestions.filter(item => item.sentence !== q.sentence);
+  } else {
+    playSound('wrong');
+    sessionWrongList.push(q.answer);
+    if (!appState.wrongQuestions.some(item => item.sentence === q.sentence)) {
+      appState.wrongQuestions.push(q);
+    }
+  }
+
+  saveData();
+  currentIndex++;
+  renderQuestion();
+}
+
+function addXP(amount) {
+  appState.xp += amount;
+  if (appState.xp >= 100) {
+    appState.level += 1;
+    appState.xp -= 100;
+  }
+  updateUI();
+}
+
+function updateUI() {
+  document.getElementById('level-num').innerText = appState.level;
+  document.getElementById('streak-num').innerText = `${appState.completedDates.length}日完了`;
+  document.getElementById('xp-fill').style.width = `${appState.xp}%`;
+  document.getElementById('xp-text').innerText = `${appState.xp} / 100 XP`;
+}
+
+function finishDrill() {
+  document.getElementById('main-card').style.display = 'none';
+  document.getElementById('clear-card').style.display = 'block';
+  document.getElementById('clear-date-text').innerText = `${selectedDateStr} のドリルを完了しました！`;
+
+  if (!appState.completedDates.includes(selectedDateStr)) {
+    appState.completedDates.push(selectedDateStr);
+    addXP(20);
+    saveData();
+  }
+
+  sendResultToSheet();
+}
+
+// --- Googleスプレッドシートへの自動送信 ---
+function sendResultToSheet() {
+  const statusElem = document.getElementById('send-status');
+  const payload = {
+    dateStr: selectedDateStr,
+    score: sessionCorrectCount,
+    total: currentQuestions.length,
+    wrongList: sessionWrongList
+  };
+
+  fetch(GOOGLE_SHEET_URL, {
+    method: 'POST',
+    mode: 'no-cors',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload)
+  }).then(() => {
+    statusElem.innerText = "✅ 保護者のスプレッドシートへ学習記録を送信しました！";
+  }).catch(() => {
+    statusElem.innerText = "⚠️ データ送信に失敗しました（オフライン状態等）。";
+  });
+}
+
+// --- 手書きキャンバス機能 ---
+let canvas, ctx, isDrawing = false;
+
+function initCanvas() {
+  canvas = document.getElementById('handwrite-canvas');
+  ctx = canvas.getContext('2d');
+  
+  canvas.addEventListener('mousedown', startDrawing);
+  canvas.addEventListener('mousemove', draw);
+  canvas.addEventListener('mouseup', stopDrawing);
+  canvas.addEventListener('mouseleave', stopDrawing);
+
+  canvas.addEventListener('touchstart', (e) => {
+    e.preventDefault();
+    const touch = e.touches[0];
+    const mouseEvent = new MouseEvent('mousedown', { clientX: touch.clientX, clientY: touch.clientY });
+    canvas.dispatchEvent(mouseEvent);
+  });
+
+  canvas.addEventListener('touchmove', (e) => {
+    e.preventDefault();
+    const touch = e.touches[0];
+    const mouseEvent = new MouseEvent('mousemove', { clientX
