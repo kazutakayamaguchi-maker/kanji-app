@@ -127,9 +127,10 @@
   <div class="header-bar">
     <div>⛏️ LEVEL: <span id="level-num" style="color:var(--mc-gold);">1</span></div>
     <div>🔥 完了日数: <span id="streak-num" style="color:var(--mc-diamond);">0日</span></div>
+    <button class="btn btn-danger" onclick="resetAllData()" style="font-size:10px; padding:2px 6px;">🧹 ゼロからやり直す</button>
   </div>
 
-  <!-- エラー警告表示エリア（問題発生時用） -->
+  <!-- エラー警告表示エリア -->
   <div id="error-box" style="display:none; background:#a82a2a; padding:10px; border:2px solid #fff; font-size:12px;"></div>
 
   <!-- 日付選択画面 -->
@@ -180,7 +181,6 @@
 </div>
 
 <script>
-// エラーキャッチ機能（画面が真っ暗になるのを防止）
 window.onerror = function(msg, url, line) {
   const errBox = document.getElementById('error-box');
   if (errBox) {
@@ -192,239 +192,10 @@ window.onerror = function(msg, url, line) {
 
 const GOOGLE_SHEET_URL = "https://script.google.com/macros/s/AKfycbyU9y0O5XWXg9QJZ8FvzgY9iV0HTA1pwe7fydhLA8iCHPCYfzJtPkmupEZwK24NZBsW/exec";
 
+// 出題問題（熟語・送り仮名バリエーション）
 const DEFAULT_QUESTIONS = [
   { grade: 4, sentence: "ネザーの儀式でモンスターを(ショウカン)する。", target: "ショウカン", answer: "召喚", reading: "しょうかん" },
   { grade: 4, sentence: "村人とエメラルドの(コウカン)をする。", target: "コウカン", answer: "交換", reading: "こうかん" },
   { grade: 4, sentence: "仲間と(キョウリョク)して巨大な城を建てる。", target: "キョウリョク", answer: "協力", reading: "きょうりょく" },
   { grade: 4, sentence: "黒曜石を並べてゲートを(カンセイ)させる。", target: "カンセイ", answer: "完成", reading: "かんせい" },
   { grade: 4, sentence: "鉄のツルハシで鉱石を(サイクツ)する。", target: "サイクツ", answer: "採掘", reading: "さいくつ" },
-  { grade: 4, sentence: "防具に(トクベツ)なエンチャントを付与する。", target: "トクベツ", answer: "特別", reading: "とくべつ" },
-  { grade: 4, sentence: "モンスターの攻撃を盾で(フセグ)。", target: "フセグ", answer: "防ぐ", reading: "ふせぐ" },
-  { grade: 4, sentence: "洞窟の奥深くを(サガル)と溶岩があった。", target: "サガル", answer: "下がる", reading: "さがる" },
-  { grade: 4, sentence: "新しいバイオームの(イチ)を特定する。", target: "イチ", answer: "位置", reading: "いち" },
-  { grade: 3, sentence: "作業台で(アタラシイ)ツールを作る。", target: "アタラシイ", answer: "新しい", reading: "あたらしい" }
-];
-
-let appState = { xp: 0, level: 1, completedDates: [], wrongQuestions: [] };
-let selectedDateStr = "";
-let currentQuestions = [];
-let currentIndex = 0;
-let sessionCorrectCount = 0;
-let sessionWrongList = [];
-
-window.onload = function() {
-  try {
-    const saved = localStorage.getItem('mc_kanji_simple_v1');
-    if (saved) appState = JSON.parse(saved);
-  } catch(e) {}
-  
-  initCanvas();
-  renderTaskList();
-  updateUI();
-};
-
-function saveData() {
-  try {
-    localStorage.setItem('mc_kanji_simple_v1', JSON.stringify(appState));
-  } catch(e) {}
-}
-
-function renderTaskList() {
-  const container = document.getElementById('task-list');
-  container.innerHTML = "";
-
-  // 10月31日から今日までの日付を表示
-  const dates = ["2026-10-31"];
-  const today = new Date();
-  const year = today.getFullYear();
-  const month = String(today.getMonth() + 1).padStart(2, '0');
-  const day = String(today.getDate()).padStart(2, '0');
-  const todayStr = `${year}-${month}-${day}`;
-  
-  if (!dates.includes(todayStr)) {
-    dates.unshift(todayStr);
-  }
-
-  dates.forEach(dStr => {
-    const isDone = appState.completedDates.includes(dStr);
-    const item = document.createElement('div');
-    item.className = 'task-item';
-    
-    item.innerHTML = `
-      <div>📅 <strong>${dStr} のドリル</strong></div>
-      <div>${isDone ? '✅ 完了' : `<button class="btn btn-green" onclick="startDrill('${dStr}')">▶ 挑戦する</button>`}</div>
-    `;
-    container.appendChild(item);
-  });
-}
-
-function startDrill(dateStr) {
-  selectedDateStr = dateStr;
-  currentIndex = 0;
-  sessionCorrectCount = 0;
-  sessionWrongList = [];
-
-  // 間違えた問題＋デフォルト問題
-  let pool = [...DEFAULT_QUESTIONS];
-  if (appState.wrongQuestions && appState.wrongQuestions.length > 0) {
-    pool = [...appState.wrongQuestions, ...pool];
-  }
-
-  // 重複除去して10問セット
-  currentQuestions = [];
-  pool.forEach(q => {
-    if (currentQuestions.length < 10 && !currentQuestions.some(x => x.sentence === q.sentence)) {
-      currentQuestions.push(q);
-    }
-  });
-
-  document.getElementById('select-card').style.display = 'none';
-  document.getElementById('main-card').style.display = 'block';
-  renderQuestion();
-}
-
-function showMenu() {
-  document.getElementById('main-card').style.display = 'none';
-  document.getElementById('clear-card').style.display = 'none';
-  document.getElementById('select-card').style.display = 'block';
-  renderTaskList();
-}
-
-function renderQuestion() {
-  if (currentIndex >= currentQuestions.length) {
-    finishDrill();
-    return;
-  }
-
-  const q = currentQuestions[currentIndex];
-  document.getElementById('q-number').innerText = `第 ${currentIndex + 1} / ${currentQuestions.length} 問`;
-  document.getElementById('q-sentence').innerHTML = q.sentence.replace(/\((.*?)\)/, '<span class="target-word">$1</span>');
-  document.getElementById('answer-panel').style.display = 'none';
-  document.getElementById('btn-check').style.display = 'inline-block';
-  clearCanvas();
-}
-
-function showAnswer() {
-  const q = currentQuestions[currentIndex];
-  document.getElementById('ans-kanji').innerText = q.answer;
-  document.getElementById('ans-reading').innerText = `よみ: ${q.reading}`;
-  document.getElementById('answer-panel').style.display = 'block';
-  document.getElementById('btn-check').style.display = 'none';
-}
-
-function evaluateResult(isCorrect) {
-  const q = currentQuestions[currentIndex];
-  if (isCorrect) {
-    sessionCorrectCount++;
-    if (appState.wrongQuestions) {
-      appState.wrongQuestions = appState.wrongQuestions.filter(x => x.sentence !== q.sentence);
-    }
-  } else {
-    sessionWrongList.push(q.answer);
-    if (!appState.wrongQuestions) appState.wrongQuestions = [];
-    if (!appState.wrongQuestions.some(x => x.sentence === q.sentence)) {
-      appState.wrongQuestions.push(q);
-    }
-  }
-  saveData();
-  currentIndex++;
-  renderQuestion();
-}
-
-function updateUI() {
-  document.getElementById('level-num').innerText = appState.level || 1;
-  document.getElementById('streak-num').innerText = `${appState.completedDates ? appState.completedDates.length : 0}日`;
-}
-
-function finishDrill() {
-  document.getElementById('main-card').style.display = 'none';
-  document.getElementById('clear-card').style.display = 'block';
-  document.getElementById('clear-date-text').innerText = `${selectedDateStr} のドリル完了！`;
-
-  if (!appState.completedDates.includes(selectedDateStr)) {
-    appState.completedDates.push(selectedDateStr);
-    saveData();
-  }
-  updateUI();
-  sendResultToSheet();
-}
-
-function sendResultToSheet() {
-  const statusElem = document.getElementById('send-status');
-  statusElem.innerText = "学習記録を送信中...";
-  
-  const payload = {
-    dateStr: selectedDateStr,
-    score: sessionCorrectCount,
-    total: currentQuestions.length,
-    wrongList: sessionWrongList
-  };
-
-  fetch(GOOGLE_SHEET_URL, {
-    method: 'POST',
-    mode: 'no-cors',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(payload)
-  }).then(() => {
-    statusElem.innerText = "✅ スプレッドシートへ送信完了！";
-  }).catch(() => {
-    statusElem.innerText = "⚠️ 送信できませんでした。";
-  });
-}
-
-// キャンバス処理
-let canvas, ctx, isDrawing = false;
-function initCanvas() {
-  canvas = document.getElementById('handwrite-canvas');
-  if (!canvas) return;
-  ctx = canvas.getContext('2d');
-  
-  canvas.addEventListener('mousedown', startDrawing);
-  canvas.addEventListener('mousemove', draw);
-  canvas.addEventListener('mouseup', stopDrawing);
-
-  canvas.addEventListener('touchstart', (e) => {
-    e.preventDefault();
-    const t = e.touches[0];
-    startDrawing({ clientX: t.clientX, clientY: t.clientY });
-  });
-  canvas.addEventListener('touchmove', (e) => {
-    e.preventDefault();
-    const t = e.touches[0];
-    draw({ clientX: t.clientX, clientY: t.clientY });
-  });
-  canvas.addEventListener('touchend', stopDrawing);
-}
-
-function startDrawing(e) {
-  isDrawing = true;
-  ctx.beginPath();
-  const rect = canvas.getBoundingClientRect();
-  ctx.moveTo(e.clientX - rect.left, e.clientY - rect.top);
-  ctx.lineWidth = 6;
-  ctx.lineCap = 'round';
-  ctx.strokeStyle = '#222';
-}
-
-function draw(e) {
-  if (!isDrawing) return;
-  const rect = canvas.getBoundingClientRect();
-  ctx.lineTo(e.clientX - rect.left, e.clientY - rect.top);
-  ctx.stroke();
-}
-
-function stopDrawing() { isDrawing = false; }
-
-function clearCanvas() {
-  if (!ctx) return;
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-  ctx.strokeStyle = '#e0e0e0';
-  ctx.lineWidth = 1;
-  ctx.beginPath();
-  ctx.moveTo(160, 0); ctx.lineTo(160, 160);
-  ctx.stroke();
-}
-</script>
-
-</body>
-</html>
