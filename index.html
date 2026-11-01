@@ -151,9 +151,7 @@
     <hr style="border-color:var(--mc-border-light); margin:16px 0 12px 0;">
 
     <h4 style="color:var(--mc-diamond); margin:0 0 8px 0;">🏆 クリアした日の記録（スタンプ帳）</h4>
-    <div id="history-list">
-      <div style="font-size:12px; color:#aaa;">まだ完了したドリルはありません。1つ目をクリアしよう！</div>
-    </div>
+    <div id="history-list"></div>
   </div>
 
   <!-- 問題カード -->
@@ -169,4 +167,22 @@
     <div style="text-align:center; margin:10px 0;">
       <canvas id="handwrite-canvas" width="320" height="160"></canvas>
       <div style="margin-top:8px;">
-        <button class="btn" onclick
+        <button class="btn" onclick="clearCanvas()">🧼 けす</button>
+        <button class="btn btn-gold" id="btn-check" onclick="showAnswer()">🔍 答えあわせ</button>
+      </div>
+    </div>
+
+    <!-- 答えあわせ -->
+    <div class="answer-panel" id="answer-panel">
+      <div>正解（せいかい）:</div>
+      <div class="answer-kanji" id="ans-kanji">探検</div>
+      <div id="ans-reading" style="font-size:14px; color:#ccc; margin-bottom:8px;"></div>
+      <div style="display:flex; justify-content:center; gap:12px;">
+        <button class="btn btn-green" onclick="evaluateResult(true)">⭕ 書けた！</button>
+        <button class="btn btn-danger" onclick="evaluateResult(false)">❌ 書けなかった</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- クリア画面 -->
+  <div class="card" id="clear-card" style
