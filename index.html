@@ -5,20 +5,14 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>マイクラ風 漢字ドリル</title>
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=DotGothic16&display=swap');
-
-    * { box-sizing: border-box; user-select: none; }
-
     body {
       margin: 0;
-      padding: 12px;
+      padding: 16px;
       background-color: #1e1b18;
       color: #ffffff;
-      font-family: 'DotGothic16', monospace, sans-serif;
+      font-family: sans-serif;
       display: flex;
       justify-content: center;
-      align-items: flex-start;
-      min-height: 100vh;
     }
 
     .app-container {
@@ -27,19 +21,16 @@
       background-color: #312b26;
       border: 4px solid #191613;
       padding: 16px;
-      margin-top: 10px;
-      position: relative;
-      z-index: 1;
     }
 
     .header-bar {
       display: flex;
       justify-content: space-between;
-      align-items: center;
       background-color: #211c18;
       padding: 10px;
       border: 2px solid #191613;
-      margin-bottom: 12px;
+      margin-bottom: 16px;
+      font-weight: bold;
     }
 
     .card {
@@ -68,37 +59,39 @@
       background: #ffffff;
       border: 4px solid #866043;
       touch-action: none;
-      cursor: crosshair;
       border-radius: 4px;
     }
 
-    .btn {
-      background: #727272;
+    /* 極めてシンプルな押しやすい大ボタン */
+    .btn-action {
+      background-color: #4a7c29;
+      color: #ffffff;
+      font-size: 20px;
+      font-weight: bold;
+      padding: 12px 24px;
       border: 3px solid #000;
-      color: #fff;
-      padding: 8px 16px;
-      font-family: 'DotGothic16', monospace;
-      font-size: 16px;
       cursor: pointer;
-      position: relative;
-      z-index: 99;
-      display: inline-block;
+      width: 100%;
+      margin-top: 8px;
     }
 
-    .btn-green { background: #4a7c29; }
-    .btn-gold { background: #c6a100; color: #000; }
-    .btn-danger { background: #a82a2a; }
+    .btn-sub {
+      background-color: #727272;
+      color: #fff;
+      padding: 6px 12px;
+      border: 2px solid #000;
+      cursor: pointer;
+    }
+
+    .btn-gold { background-color: #c6a100; color: #000; }
+    .btn-green { background-color: #4a7c29; }
+    .btn-danger { background-color: #a82a2a; }
 
     .task-item {
       background: #211c18;
       border: 2px solid #494038;
       padding: 12px;
-      margin-bottom: 8px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      position: relative;
-      z-index: 10;
+      margin-bottom: 12px;
     }
 
     .history-item {
@@ -142,15 +135,13 @@
     <h3 style="color:#fdf55f; margin:0 0 12px 0;">📜 今日のドリルを選ぼう！</h3>
     
     <div class="task-item">
-      <div>📅 <strong>2026-11-01 のドリル</strong></div>
-      <div>
-        <button class="btn btn-green" id="start-btn-1101">▶ 挑戦する</button>
-      </div>
+      <div style="font-size:18px; margin-bottom:8px;">📅 <strong>2026-11-01 のドリル</strong></div>
+      <button class="btn-action" onclick="startDrill('2026-11-01')">▶ 挑戦する（スタート）</button>
     </div>
     
     <div class="task-item">
       <div>📅 <strong>2026-10-31 のドリル</strong></div>
-      <div style="color:#aaa;">✅ 完了済み</div>
+      <div style="color:#aaa; margin-top:4px;">✅ 完了済み</div>
     </div>
 
     <hr style="border-color:#494038; margin:16px 0 12px 0;">
@@ -165,7 +156,7 @@
   <!-- 問題カード -->
   <div class="card" id="main-card" style="display:none;">
     <div style="display:flex; justify-content:space-between; align-items:center;">
-      <button class="btn" onclick="showMenu()" style="font-size:10px; padding:2px 6px;">🔙 一覧へ</button>
+      <button class="btn-sub" onclick="showMenu()">🔙 一覧へ</button>
       <span id="q-number">第 1 / 10 問</span>
     </div>
 
@@ -174,9 +165,9 @@
     <!-- キャンバス -->
     <div style="text-align:center; margin:10px 0;">
       <canvas id="handwrite-canvas" width="320" height="160"></canvas>
-      <div style="margin-top:8px;">
-        <button class="btn" onclick="clearCanvas()">🧼 けす</button>
-        <button class="btn btn-gold" id="btn-check" onclick="showAnswer()">🔍 答えあわせ</button>
+      <div style="margin-top:12px; display:flex; justify-content:center; gap:12px;">
+        <button class="btn-sub" onclick="clearCanvas()">🧼 けす</button>
+        <button class="btn-sub btn-gold" id="btn-check" onclick="showAnswer()">🔍 答えあわせ</button>
       </div>
     </div>
 
@@ -186,8 +177,8 @@
       <div class="answer-kanji" id="ans-kanji">探検</div>
       <div id="ans-reading" style="font-size:14px; color:#ccc; margin-bottom:8px;"></div>
       <div style="display:flex; justify-content:center; gap:12px;">
-        <button class="btn btn-green" onclick="evaluateResult(true)">⭕ 書けた！</button>
-        <button class="btn btn-danger" onclick="evaluateResult(false)">❌ 書けなかった</button>
+        <button class="btn-sub btn-green" onclick="evaluateResult(true)">⭕ 書けた！</button>
+        <button class="btn-sub btn-danger" onclick="evaluateResult(false)">❌ 書けなかった</button>
       </div>
     </div>
   </div>
@@ -198,9 +189,176 @@
     <p id="clear-date-text"></p>
     <div style="font-size:48px; margin:16px 0;">💎</div>
     <p id="send-status" style="font-size:12px; color:#4cedd9;"></p>
-    <button class="btn btn-green" onclick="showMenu()">ドリル一覧にもどる</button>
+    <button class="btn-sub btn-green" onclick="showMenu()">ドリル一覧にもどる</button>
   </div>
 </div>
 
 <script>
-var GOOGLE_SHEET_URL = "https
+var GOOGLE_SHEET_URL = "https://script.google.com/macros/s/AKfycbyU9y0O5XWXg9QJZ8FvzgY9iV0HTA1pwe7fydhLA8iCHPCYfzJtPkmupEZwK24NZBsW/exec";
+
+var QUESTIONS_1101 = [
+  { grade: 4, sentence: "未知のネザー要塞を(タンケン)する。", target: "タンケン", answer: "探検", reading: "たんけん" },
+  { grade: 4, sentence: "トロッコに乗って(コウソク)で移動する。", target: "コウソク", answer: "高速", reading: "こうそく" },
+  { grade: 4, sentence: "敵の攻撃を(シズカ)にかわす。", target: "シズカ", answer: "静か", reading: "しずか" },
+  { grade: 4, sentence: "拠点への(シンノウ)者を撃退する。", target: "シンノウ", answer: "侵入", reading: "しんにゅう" },
+  { grade: 4, sentence: "拠点に(ギョウショウニン)がやってきた。", target: "ギョウショウニン", answer: "行商人", reading: "ぎょうしょうにん" },
+  { grade: 4, sentence: "チェストの中身を(セイリ)する。", target: "セイリ", answer: "整理", reading: "せいり" },
+  { grade: 4, sentence: "エンダーマンと目を合わさずに(タチサガル)。", target: "タチサガル", answer: "立ち去る", reading: "たちさる" },
+  { grade: 4, sentence: "マグマの海に橋を(カケル)。", target: "カケル", answer: "架ける", reading: "かける" },
+  { grade: 4, sentence: "ダイヤの装備で防御力を(カシコマク)高める。", target: "カシコマク", answer: "賢く", reading: "かしこく" },
+  { grade: 3, sentence: "夜になる前に(ハヤク)家へ帰る。", target: "ハヤク", answer: "早く", reading: "はやく" }
+];
+
+var selectedDateStr = "";
+var currentQuestions = [];
+var currentIndex = 0;
+var sessionCorrectCount = 0;
+var sessionDetails = [];
+
+window.onload = function() {
+  initCanvas();
+};
+
+function startDrill(dateStr) {
+  selectedDateStr = dateStr;
+  currentIndex = 0;
+  sessionCorrectCount = 0;
+  sessionDetails = [];
+
+  currentQuestions = QUESTIONS_1101;
+
+  document.getElementById('select-card').style.display = 'none';
+  document.getElementById('clear-card').style.display = 'none';
+  document.getElementById('main-card').style.display = 'block';
+  
+  renderQuestion();
+}
+
+function showMenu() {
+  document.getElementById('main-card').style.display = 'none';
+  document.getElementById('clear-card').style.display = 'none';
+  document.getElementById('select-card').style.display = 'block';
+}
+
+function renderQuestion() {
+  if (currentIndex >= currentQuestions.length) {
+    finishDrill();
+    return;
+  }
+
+  var q = currentQuestions[currentIndex];
+  document.getElementById('q-number').innerText = '第 ' + (currentIndex + 1) + ' / ' + currentQuestions.length + ' 問';
+  document.getElementById('q-sentence').innerHTML = q.sentence.replace(/\((.*?)\)/, '<span class="target-word">$1</span>');
+  document.getElementById('answer-panel').style.display = 'none';
+  document.getElementById('btn-check').style.display = 'inline-block';
+  clearCanvas();
+}
+
+function showAnswer() {
+  var q = currentQuestions[currentIndex];
+  document.getElementById('ans-kanji').innerText = q.answer;
+  document.getElementById('ans-reading').innerText = 'よみ: ' + q.reading;
+  document.getElementById('answer-panel').style.display = 'block';
+  document.getElementById('btn-check').style.display = 'none';
+}
+
+function evaluateResult(isCorrect) {
+  var q = currentQuestions[currentIndex];
+  var qNum = currentIndex + 1;
+  
+  if (isCorrect) {
+    sessionCorrectCount++;
+    sessionDetails.push(qNum + '問目: [小' + q.grade + '] ' + q.sentence + ' | 正解: ' + q.answer + ' | 結果: ⭕正解');
+  } else {
+    sessionDetails.push(qNum + '問目: [小' + q.grade + '] ' + q.sentence + ' | 正解: ' + q.answer + ' | 結果: ❌不正解');
+  }
+  currentIndex++;
+  renderQuestion();
+}
+
+function finishDrill() {
+  document.getElementById('main-card').style.display = 'none';
+  document.getElementById('clear-card').style.display = 'block';
+  document.getElementById('clear-date-text').innerText = selectedDateStr + ' のドリル完了！';
+  sendResultToSheet();
+}
+
+function sendResultToSheet() {
+  var statusElem = document.getElementById('send-status');
+  statusElem.innerText = "詳細な学習記録を送信中...";
+  
+  var payload = {
+    dateStr: selectedDateStr,
+    score: sessionCorrectCount,
+    total: currentQuestions.length,
+    details: sessionDetails
+  };
+
+  fetch(GOOGLE_SHEET_URL, {
+    method: 'POST',
+    mode: 'no-cors',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload)
+  }).then(function() {
+    statusElem.innerText = "✅ スプレッドシートへ詳細記録を送信完了！";
+  }).catch(function() {
+    statusElem.innerText = "⚠️ 送信できませんでした。";
+  });
+}
+
+// キャンバス描画機能
+var canvas, ctx, isDrawing = false;
+function initCanvas() {
+  canvas = document.getElementById('handwrite-canvas');
+  if (!canvas) return;
+  ctx = canvas.getContext('2d');
+  
+  canvas.addEventListener('mousedown', startDrawing);
+  canvas.addEventListener('mousemove', draw);
+  canvas.addEventListener('mouseup', stopDrawing);
+
+  canvas.addEventListener('touchstart', function(e) {
+    e.preventDefault();
+    var t = e.touches[0];
+    startDrawing({ clientX: t.clientX, clientY: t.clientY });
+  });
+  canvas.addEventListener('touchmove', function(e) {
+    e.preventDefault();
+    var t = e.touches[0];
+    draw({ clientX: t.clientX, clientY: t.clientY });
+  });
+  canvas.addEventListener('touchend', stopDrawing);
+}
+
+function startDrawing(e) {
+  isDrawing = true;
+  ctx.beginPath();
+  var rect = canvas.getBoundingClientRect();
+  ctx.moveTo(e.clientX - rect.left, e.clientY - rect.top);
+  ctx.lineWidth = 6;
+  ctx.lineCap = 'round';
+  ctx.strokeStyle = '#222';
+}
+
+function draw(e) {
+  if (!isDrawing) return;
+  var rect = canvas.getBoundingClientRect();
+  ctx.lineTo(e.clientX - rect.left, e.clientY - rect.top);
+  ctx.stroke();
+}
+
+function stopDrawing() { isDrawing = false; }
+
+function clearCanvas() {
+  if (!ctx) return;
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  ctx.strokeStyle = '#e0e0e0';
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.moveTo(160, 0); ctx.lineTo(160, 160);
+  ctx.stroke();
+}
+</script>
+
+</body>
+</html>
