@@ -137,7 +137,7 @@
   <!-- ヘッダー -->
   <div class="header-bar">
     <div>⛏️ LEVEL: <span id="level-num" style="color:var(--mc-gold);">1</span></div>
-    <div>🔥 頑張った日数: <span id="streak-num" style="color:var(--mc-diamond);">0日</span></div>
+    <div>🔥 頑張った日数: <span id="streak-num" style="color:var(--mc-diamond);">1日</span></div>
     <button class="btn btn-danger" onclick="resetAllData()" style="font-size:10px; padding:2px 6px;">🧹 リセット</button>
   </div>
 
@@ -150,39 +150,4 @@
 
     <hr style="border-color:var(--mc-border-light); margin:16px 0 12px 0;">
 
-    <h4 style="color:var(--mc-diamond); margin:0 0 8px 0;">🏆 クリアした日の記録（スタンプ帳）</h4>
-    <div id="history-list"></div>
-  </div>
-
-  <!-- 問題カード -->
-  <div class="card" id="main-card" style="display:none;">
-    <div style="display:flex; justify-content:space-between; align-items:center;">
-      <button class="btn" onclick="showMenu()" style="font-size:10px; padding:2px 6px;">🔙 一覧へ</button>
-      <span id="q-number">第 1 / 10 問</span>
-    </div>
-
-    <div class="question-box" id="q-sentence">読み込み中...</div>
-
-    <!-- キャンバス -->
-    <div style="text-align:center; margin:10px 0;">
-      <canvas id="handwrite-canvas" width="320" height="160"></canvas>
-      <div style="margin-top:8px;">
-        <button class="btn" onclick="clearCanvas()">🧼 けす</button>
-        <button class="btn btn-gold" id="btn-check" onclick="showAnswer()">🔍 答えあわせ</button>
-      </div>
-    </div>
-
-    <!-- 答えあわせ -->
-    <div class="answer-panel" id="answer-panel">
-      <div>正解（せいかい）:</div>
-      <div class="answer-kanji" id="ans-kanji">探検</div>
-      <div id="ans-reading" style="font-size:14px; color:#ccc; margin-bottom:8px;"></div>
-      <div style="display:flex; justify-content:center; gap:12px;">
-        <button class="btn btn-green" onclick="evaluateResult(true)">⭕ 書けた！</button>
-        <button class="btn btn-danger" onclick="evaluateResult(false)">❌ 書けなかった</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- クリア画面 -->
-  <div class="card" id="clear-card" style
+    <h4
