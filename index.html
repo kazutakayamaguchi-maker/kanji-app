@@ -7,39 +7,27 @@
   <style>
     @import url('https://fonts.googleapis.com/css2?family=DotGothic16&display=swap');
 
-    :root {
-      --mc-dark-bg: #1e1b18;
-      --mc-panel: #312b26;
-      --mc-border-light: #494038;
-      --mc-border-dark: #191613;
-      --mc-grass: #4a7c29;
-      --mc-gold: #fdf55f;
-      --mc-diamond: #4cedd9;
-    }
-
     * { box-sizing: border-box; user-select: none; }
 
     body {
       margin: 0;
       padding: 12px;
-      background-color: var(--mc-dark-bg);
+      background-color: #1e1b18;
       color: #ffffff;
       font-family: 'DotGothic16', monospace, sans-serif;
       display: flex;
       justify-content: center;
-      align-items: center;
+      align-items: flex-start;
       min-height: 100vh;
     }
 
     .app-container {
       width: 100%;
-      max-width: 720px;
-      background-color: var(--mc-panel);
-      border: 4px solid var(--mc-border-dark);
+      max-width: 600px;
+      background-color: #312b26;
+      border: 4px solid #191613;
       padding: 16px;
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
+      margin-top: 10px;
     }
 
     .header-bar {
@@ -48,17 +36,19 @@
       align-items: center;
       background-color: #211c18;
       padding: 10px;
-      border: 2px solid var(--mc-border-dark);
+      border: 2px solid #191613;
+      margin-bottom: 12px;
     }
 
     .card {
       background-color: #3b352f;
-      border: 3px solid var(--mc-border-dark);
+      border: 3px solid #191613;
       padding: 16px;
+      margin-bottom: 12px;
     }
 
     .question-box {
-      font-size: 22px;
+      font-size: 20px;
       line-height: 1.6;
       margin: 12px 0;
       background: #28231e;
@@ -67,8 +57,8 @@
     }
 
     .target-word {
-      color: var(--mc-gold);
-      border-bottom: 3px dashed var(--mc-gold);
+      color: #fdf55f;
+      border-bottom: 3px dashed #fdf55f;
       font-weight: bold;
     }
 
@@ -90,13 +80,13 @@
       cursor: pointer;
     }
 
-    .btn-green { background: var(--mc-grass); }
+    .btn-green { background: #4a7c29; }
     .btn-gold { background: #c6a100; color: #000; }
     .btn-danger { background: #a82a2a; }
 
     .task-item {
       background: #211c18;
-      border: 2px solid var(--mc-border-light);
+      border: 2px solid #494038;
       padding: 12px;
       margin-bottom: 8px;
       display: flex;
@@ -106,8 +96,8 @@
 
     .history-item {
       background: #1a1714;
-      border: 1px solid var(--mc-grass);
-      color: var(--mc-gold);
+      border: 1px solid #4a7c29;
+      color: #fdf55f;
       padding: 8px 12px;
       margin-top: 6px;
       font-size: 14px;
@@ -118,15 +108,15 @@
     .answer-panel {
       display: none;
       background: #25201b;
-      border: 2px solid var(--mc-diamond);
+      border: 2px solid #4cedd9;
       padding: 12px;
       margin-top: 10px;
       text-align: center;
     }
 
     .answer-kanji {
-      font-size: 56px;
-      color: var(--mc-gold);
+      font-size: 52px;
+      color: #fdf55f;
       margin: 4px 0;
     }
   </style>
@@ -136,4 +126,4 @@
 <div class="app-container">
   <!-- ヘッダー -->
   <div class="header-bar">
-    <div>⛏️ LEVEL: <span id="level-num" style="color:var
+    <div>⛏️ LEVEL: <span style="color:#fdf5
