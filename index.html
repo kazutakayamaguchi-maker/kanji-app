@@ -121,3 +121,52 @@
       border: 2px solid var(--mc-diamond);
       padding: 12px;
       margin-top: 10px;
+      text-align: center;
+    }
+
+    .answer-kanji {
+      font-size: 56px;
+      color: var(--mc-gold);
+      margin: 4px 0;
+    }
+  </style>
+</head>
+<body>
+
+<div class="app-container">
+  <!-- ヘッダー -->
+  <div class="header-bar">
+    <div>⛏️ LEVEL: <span id="level-num" style="color:var(--mc-gold);">1</span></div>
+    <div>🔥 頑張った日数: <span id="streak-num" style="color:var(--mc-diamond);">0日</span></div>
+    <button class="btn btn-danger" onclick="resetAllData()" style="font-size:10px; padding:2px 6px;">🧹 リセット</button>
+  </div>
+
+  <div id="error-box" style="display:none; background:#a82a2a; padding:10px; border:2px solid #fff; font-size:12px;"></div>
+
+  <!-- トップ画面 -->
+  <div class="card" id="select-card">
+    <h3 style="color:var(--mc-gold); margin:0 0 8px 0;">📜 今日のドリルを選ぼう！</h3>
+    <div id="task-list"></div>
+
+    <hr style="border-color:var(--mc-border-light); margin:16px 0 12px 0;">
+
+    <h4 style="color:var(--mc-diamond); margin:0 0 8px 0;">🏆 クリアした日の記録（スタンプ帳）</h4>
+    <div id="history-list">
+      <div style="font-size:12px; color:#aaa;">まだ完了したドリルはありません。1つ目をクリアしよう！</div>
+    </div>
+  </div>
+
+  <!-- 問題カード -->
+  <div class="card" id="main-card" style="display:none;">
+    <div style="display:flex; justify-content:space-between; align-items:center;">
+      <button class="btn" onclick="showMenu()" style="font-size:10px; padding:2px 6px;">🔙 一覧へ</button>
+      <span id="q-number">第 1 / 10 問</span>
+    </div>
+
+    <div class="question-box" id="q-sentence">読み込み中...</div>
+
+    <!-- キャンバス -->
+    <div style="text-align:center; margin:10px 0;">
+      <canvas id="handwrite-canvas" width="320" height="160"></canvas>
+      <div style="margin-top:8px;">
+        <button class="btn" onclick
