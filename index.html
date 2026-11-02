@@ -62,7 +62,6 @@
       border-radius: 4px;
     }
 
-    /* 極めてシンプルな押しやすい大ボタン */
     .btn-action {
       background-color: #4a7c29;
       color: #ffffff;
@@ -127,30 +126,19 @@
   <!-- ヘッダー -->
   <div class="header-bar">
     <div>⛏️ LEVEL: <span style="color:#fdf55f;">1</span></div>
-    <div>🔥 頑張った日数: <span style="color:#4cedd9;">1日</span></div>
+    <div>🔥 頑張った日数: <span id="streak-num" style="color:#4cedd9;">2日</span></div>
   </div>
 
   <!-- トップ画面 -->
   <div class="card" id="select-card">
     <h3 style="color:#fdf55f; margin:0 0 12px 0;">📜 今日のドリルを選ぼう！</h3>
     
-    <div class="task-item">
-      <div style="font-size:18px; margin-bottom:8px;">📅 <strong>2026-11-01 のドリル</strong></div>
-      <button class="btn-action" onclick="startDrill('2026-11-01')">▶ 挑戦する（スタート）</button>
-    </div>
-    
-    <div class="task-item">
-      <div>📅 <strong>2026-10-31 のドリル</strong></div>
-      <div style="color:#aaa; margin-top:4px;">✅ 完了済み</div>
-    </div>
+    <div id="task-list-area"></div>
 
     <hr style="border-color:#494038; margin:16px 0 12px 0;">
 
     <h4 style="color:#4cedd9; margin:0 0 8px 0;">🏆 クリアした日の記録（スタンプ帳）</h4>
-    <div class="history-item">
-      <span>✅ 2026-10-31 ドリル達成！</span>
-      <span>💎 CLEAR</span>
-    </div>
+    <div id="history-list-area"></div>
   </div>
 
   <!-- 問題カード -->
@@ -174,7 +162,7 @@
     <!-- 答えあわせ -->
     <div class="answer-panel" id="answer-panel">
       <div>正解（せいかい）:</div>
-      <div class="answer-kanji" id="ans-kanji">探検</div>
+      <div class="answer-kanji" id="ans-kanji">建築</div>
       <div id="ans-reading" style="font-size:14px; color:#ccc; margin-bottom:8px;"></div>
       <div style="display:flex; justify-content:center; gap:12px;">
         <button class="btn-sub btn-green" onclick="evaluateResult(true)">⭕ 書けた！</button>
@@ -196,19 +184,22 @@
 <script>
 var GOOGLE_SHEET_URL = "https://script.google.com/macros/s/AKfycbyU9y0O5XWXg9QJZ8FvzgY9iV0HTA1pwe7fydhLA8iCHPCYfzJtPkmupEZwK24NZBsW/exec";
 
-var QUESTIONS_1101 = [
-  { grade: 4, sentence: "未知のネザー要塞を(タンケン)する。", target: "タンケン", answer: "探検", reading: "たんけん" },
-  { grade: 4, sentence: "トロッコに乗って(コウソク)で移動する。", target: "コウソク", answer: "高速", reading: "こうそく" },
-  { grade: 4, sentence: "敵の攻撃を(シズカ)にかわす。", target: "シズカ", answer: "静か", reading: "しずか" },
-  { grade: 4, sentence: "拠点への(シンノウ)者を撃退する。", target: "シンノウ", answer: "侵入", reading: "しんにゅう" },
-  { grade: 4, sentence: "拠点に(ギョウショウニン)がやってきた。", target: "ギョウショウニン", answer: "行商人", reading: "ぎょうしょうにん" },
-  { grade: 4, sentence: "チェストの中身を(セイリ)する。", target: "セイリ", answer: "整理", reading: "せいり" },
-  { grade: 4, sentence: "エンダーマンと目を合わさずに(タチサガル)。", target: "タチサガル", answer: "立ち去る", reading: "たちさる" },
-  { grade: 4, sentence: "マグマの海に橋を(カケル)。", target: "カケル", answer: "架ける", reading: "かける" },
-  { grade: 4, sentence: "ダイヤの装備で防御力を(カシコマク)高める。", target: "カシコマク", answer: "賢く", reading: "かしこく" },
-  { grade: 3, sentence: "夜になる前に(ハヤク)家へ帰る。", target: "ハヤク", answer: "早く", reading: "はやく" }
+// 11/02 精選問題セット（全10問）
+var QUESTIONS_1102 = [
+  { grade: 4, sentence: "巨大なタワーの(ケンチク)を開始する。", target: "ケンチク", answer: "建築", reading: "けんちく" },
+  { grade: 4, sentence: "チェストの(イシ)ブロックを取り出す。", target: "イシ", answer: "石", reading: "いし" },
+  { grade: 4, sentence: "マグマに落ちないよう(チュウイ)して進む。", target: "チュウイ", answer: "注意", reading: "ちゅうい" },
+  { grade: 4, sentence: "ネザー要塞で(キチョウ)な素材を見つける。", target: "キチョウ", answer: "貴重", reading: "きちょう" },
+  { grade: 4, sentence: "水流を使って(ジドウ)で収穫する農園を作る。", target: "ジドウ", answer: "自動", reading: "じどう" },
+  { grade: 4, sentence: "村人とのトレードで(コウカン)をする。", target: "コウカン", answer: "交換", reading: "こうかん" },
+  { grade: 4, sentence: "夜になるとモンスターが(シュツゲン)する。", target: "シュツゲン", answer: "出現", reading: "しゅつげん" },
+  { grade: 4, sentence: "ダイヤの剣に強いエンチャントを(ツ)ける。", target: "ツ", answer: "付", reading: "つける" },
+  { grade: 4, sentence: "洞窟の暗闇を松明で(テ)らす。", target: "テ", answer: "照", reading: "てらす" },
+  { grade: 3, sentence: "ゾンビの攻撃を剣で(フセ)ぐ。", target: "フセ", answer: "防", reading: "ふせぐ" }
 ];
 
+// 初期データ（10/31と11/01を完了済みとして記憶）
+var appState = { xp: 0, level: 1, completedDates: ["2026-10-31", "2026-11-01"] };
 var selectedDateStr = "";
 var currentQuestions = [];
 var currentIndex = 0;
@@ -217,7 +208,65 @@ var sessionDetails = [];
 
 window.onload = function() {
   initCanvas();
+  loadData();
+  renderTopMenu();
 };
+
+function loadData() {
+  try {
+    var saved = localStorage.getItem('mc_kanji_app_state_v2');
+    if (saved) {
+      appState = JSON.parse(saved);
+      // 念のため過去の完了実績を保持補正
+      if (!appState.completedDates.includes("2026-10-31")) appState.completedDates.push("2026-10-31");
+      if (!appState.completedDates.includes("2026-11-01")) appState.completedDates.push("2026-11-01");
+    } else {
+      saveData();
+    }
+  } catch(e) {}
+}
+
+function saveData() {
+  try {
+    localStorage.setItem('mc_kanji_app_state_v2', JSON.stringify(appState));
+  } catch(e) {}
+}
+
+// トップ画面の動的描画（完了状態の自動更新）
+function renderTopMenu() {
+  document.getElementById('streak-num').innerText = appState.completedDates.length + "日";
+
+  var taskArea = document.getElementById('task-list-area');
+  var historyArea = document.getElementById('history-list-area');
+
+  // 1. 今日のドリルリスト描画
+  var dates = ["2026-11-02", "2026-11-01", "2026-10-31"];
+  var taskHtml = "";
+
+  dates.forEach(function(dStr) {
+    var isDone = appState.completedDates.indexOf(dStr) !== -1;
+    taskHtml += '<div class="task-item">';
+    taskHtml += '  <div style="font-size:18px; margin-bottom:6px;">📅 <strong>' + dStr + ' のドリル</strong></div>';
+    if (isDone) {
+      taskHtml += '  <div style="color:#aaa; font-weight:bold;">✅ 完了済み</div>';
+    } else {
+      taskHtml += '  <button class="btn-action" onclick="startDrill(\'' + dStr + '\')">▶ 挑戦する（スタート）</button>';
+    }
+    taskHtml += '</div>';
+  });
+  taskArea.innerHTML = taskHtml;
+
+  // 2. スタンプ帳（クリア履歴）描画
+  var historyHtml = "";
+  var sortedDates = appState.completedDates.slice().reverse();
+  sortedDates.forEach(function(dStr) {
+    historyHtml += '<div class="history-item">';
+    historyHtml += '  <span>✅ ' + dStr + ' ドリル達成！</span>';
+    historyHtml += '  <span>💎 CLEAR</span>';
+    historyHtml += '</div>';
+  });
+  historyArea.innerHTML = historyHtml;
+}
 
 function startDrill(dateStr) {
   selectedDateStr = dateStr;
@@ -225,7 +274,7 @@ function startDrill(dateStr) {
   sessionCorrectCount = 0;
   sessionDetails = [];
 
-  currentQuestions = QUESTIONS_1101;
+  currentQuestions = QUESTIONS_1102;
 
   document.getElementById('select-card').style.display = 'none';
   document.getElementById('clear-card').style.display = 'none';
@@ -238,6 +287,7 @@ function showMenu() {
   document.getElementById('main-card').style.display = 'none';
   document.getElementById('clear-card').style.display = 'none';
   document.getElementById('select-card').style.display = 'block';
+  renderTopMenu();
 }
 
 function renderQuestion() {
@@ -276,10 +326,18 @@ function evaluateResult(isCorrect) {
   renderQuestion();
 }
 
+// 10問完了時の処理
 function finishDrill() {
   document.getElementById('main-card').style.display = 'none';
   document.getElementById('clear-card').style.display = 'block';
   document.getElementById('clear-date-text').innerText = selectedDateStr + ' のドリル完了！';
+
+  // 完了フラグの自動保存
+  if (appState.completedDates.indexOf(selectedDateStr) === -1) {
+    appState.completedDates.push(selectedDateStr);
+    saveData();
+  }
+
   sendResultToSheet();
 }
 
