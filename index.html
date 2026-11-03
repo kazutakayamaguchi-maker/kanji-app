@@ -67,7 +67,7 @@
       color: #ffffff;
       font-size: 20px;
       font-weight: bold;
-      padding: 12px 24px;
+      padding: 14px 24px;
       border: 3px solid #000;
       cursor: pointer;
       width: 100%;
@@ -133,12 +133,34 @@
   <div class="card" id="select-card">
     <h3 style="color:#fdf55f; margin:0 0 12px 0;">📜 今日のドリルを選ぼう！</h3>
     
-    <div id="task-list-area"></div>
+    <div class="task-item">
+      <div style="font-size:18px; margin-bottom:6px;">📅 <strong>2026-11-03 のドリル</strong></div>
+      <button class="btn-action" onclick="forceStartDrill('2026-11-03')">▶ 挑戦する（スタート）</button>
+    </div>
+
+    <div class="task-item">
+      <div>📅 <strong>2026-11-02 のドリル</strong></div>
+      <div style="color:#aaa; font-weight:bold;">✅ 完了済み</div>
+    </div>
+
+    <div class="task-item">
+      <div>📅 <strong>2026-11-01 のドリル</strong></div>
+      <div style="color:#aaa; font-weight:bold;">✅ 完了済み</div>
+    </div>
+
+    <div class="task-item">
+      <div>📅 <strong>2026-10-31 のドリル</strong></div>
+      <div style="color:#aaa; font-weight:bold;">✅ 完了済み</div>
+    </div>
 
     <hr style="border-color:#494038; margin:16px 0 12px 0;">
 
     <h4 style="color:#4cedd9; margin:0 0 8px 0;">🏆 クリアした日の記録（スタンプ帳）</h4>
-    <div id="history-list-area"></div>
+    <div id="history-list-area">
+      <div class="history-item"><span>✅ 2026-11-02 ドリル達成！</span><span>💎 CLEAR</span></div>
+      <div class="history-item"><span>✅ 2026-11-01 ドリル達成！</span><span>💎 CLEAR</span></div>
+      <div class="history-item"><span>✅ 2026-10-31 ドリル達成！</span><span>💎 CLEAR</span></div>
+    </div>
   </div>
 
   <!-- 問題カード -->
@@ -151,4 +173,48 @@
     <div class="question-box" id="q-sentence">読み込み中...</div>
 
     <!-- キャンバス -->
-    <div style
+    <div style="text-align:center; margin:10px 0;">
+      <canvas id="handwrite-canvas" width="320" height="160"></canvas>
+      <div style="margin-top:12px; display:flex; justify-content:center; gap:12px;">
+        <button class="btn-sub" onclick="clearCanvas()">🧼 けす</button>
+        <button class="btn-sub btn-gold" id="btn-check" onclick="showAnswer()">🔍 答えあわせ</button>
+      </div>
+    </div>
+
+    <!-- 答えあわせ -->
+    <div class="answer-panel" id="answer-panel">
+      <div>正解（せいかい）:</div>
+      <div class="answer-kanji" id="ans-kanji">命</div>
+      <div id="ans-reading" style="font-size:14px; color:#ccc; margin-bottom:8px;"></div>
+      <div style="display:flex; justify-content:center; gap:12px;">
+        <button class="btn-sub btn-green" onclick="evaluateResult(true)">⭕ 書けた！</button>
+        <button class="btn-sub btn-danger" onclick="evaluateResult(false)">❌ 書けなかった</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- クリア画面 -->
+  <div class="card" id="clear-card" style="display:none; text-align:center;">
+    <h2 style="color:#fdf55f;">🎉 クリアおめでとう！</h2>
+    <p id="clear-date-text"></p>
+    <div style="font-size:48px; margin:16px 0;">💎</div>
+    <p id="send-status" style="font-size:12px; color:#4cedd9;"></p>
+    <button class="btn-sub btn-green" onclick="showMenu()">ドリル一覧にもどる</button>
+  </div>
+</div>
+
+<script>
+var GOOGLE_SHEET_URL = "https://script.google.com/macros/s/AKfycbyU9y0O5XWXg9QJZ8FvzgY9iV0HTA1pwe7fydhLA8iCHPCYfzJtPkmupEZwK24NZBsW/exec";
+
+// 11/03 精選問題セット（全10問）
+var QUESTIONS_1103 = [
+  { grade: 3, sentence: "ネザー要塞でブレイズの(イノチ)をねらう。", target: "イノチ", answer: "命", reading: "いのち" },
+  { grade: 4, sentence: "(ユウキ)を出してエンドドラゴンに挑む。", target: "ユウキ", answer: "勇気", reading: "ゆうき" },
+  { grade: 4, sentence: "不要なアイテムをエメラルドに(ヘンカン)する。", target: "ヘンカン", answer: "変換", reading: "へんかん" },
+  { grade: 4, sentence: "仲間の作業を(テツダ)う。", target: "テツダ", answer: "手伝", reading: "てつだう" },
+  { grade: 3, sentence: "クリーパーの爆発から(シナモノ)を守る。", target: "シナモノ", answer: "品物", reading: "しなもの" },
+  { grade: 4, sentence: "(トクベツ)なエンチャント本を入手する。", target: "トクベツ", answer: "特別", reading: "とくべつ" },
+  { grade: 4, sentence: "難関ダンジョンの攻略に(セイコウ)する。", target: "セイコウ", answer: "成功", reading: "せいこう" },
+  { grade: 4, sentence: "拠点に頑丈な家を(タテ)てる。", target: "タテ", answer: "建", reading: "たてる" },
+  { grade: 2, sentence: "拠点までの安全な(ミチ)を整備する。", target: "ミチ", answer: "道", reading: "みち" },
+  { grade: 3, sentence: "(アタラ
