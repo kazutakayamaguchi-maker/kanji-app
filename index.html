@@ -136,13 +136,25 @@
     <h3 style="color:#fdf55f; margin:0 0 12px 0;">📜 今日のドリルを選ぼう！</h3>
     
     <div id="task-list-area">
-      <!-- 11/06（全12問：間違えた8問＋追加4問） -->
+      <!-- 11/06（本日分：復習12問） -->
       <div class="task-item">
         <div style="font-size:18px; margin-bottom:6px;">📅 <strong>2026-11-06 のドリル（復習12問）</strong></div>
         <button class="btn-action" onclick="forceStartDrill('2026-11-06')">▶ 挑戦する（スタート）</button>
       </div>
 
-      <!-- 11/05（昨日分） -->
+      <!-- 11/04（未実施：いつでも挑戦可能） -->
+      <div class="task-item">
+        <div style="font-size:18px; margin-bottom:6px;">📅 <strong>2026-11-04 のドリル（未実施）</strong></div>
+        <button class="btn-action" style="background-color:#c6a100; color:#000;" onclick="forceStartDrill('2026-11-04')">▶ 挑戦する（11/4分）</button>
+      </div>
+
+      <!-- 11/03（未実施：いつでも挑戦可能） -->
+      <div class="task-item">
+        <div style="font-size:18px; margin-bottom:6px;">📅 <strong>2026-11-03 のドリル（未実施）</strong></div>
+        <button class="btn-action" style="background-color:#c6a100; color:#000;" onclick="forceStartDrill('2026-11-03')">▶ 挑戦する（11/3分）</button>
+      </div>
+
+      <!-- 過去の完了済み -->
       <div class="task-item">
         <div>📅 <strong>2026-11-05 のドリル</strong></div>
         <div style="color:#aaa; font-weight:bold;">✅ 完了済み (9/17正解)</div>
@@ -234,149 +246,6 @@ var QUESTIONS_1106 = [
   { grade: 4, sentence: "体調を戻して風邪を(ナオ)す。", target: "ナオ", answer: "治", reading: "なおす" }
 ];
 
-var selectedDateStr = "";
-var currentQuestions = [];
-var currentIndex = 0;
-var sessionCorrectCount = 0;
-var sessionDetails = [];
-
-function forceStartDrill(dateStr) {
-  selectedDateStr = dateStr;
-  currentIndex = 0;
-  sessionCorrectCount = 0;
-  sessionDetails = [];
-  currentQuestions = QUESTIONS_1106;
-
-  document.getElementById('select-card').style.display = 'none';
-  document.getElementById('clear-card').style.display = 'none';
-  document.getElementById('main-card').style.display = 'block';
-
-  renderQuestion();
-}
-
-function showMenu() {
-  document.getElementById('main-card').style.display = 'none';
-  document.getElementById('clear-card').style.display = 'none';
-  document.getElementById('select-card').style.display = 'block';
-}
-
-function renderQuestion() {
-  if (currentIndex >= currentQuestions.length) {
-    finishDrill();
-    return;
-  }
-
-  var q = currentQuestions[currentIndex];
-  document.getElementById('q-number').innerText = '第 ' + (currentIndex + 1) + ' / ' + currentQuestions.length + ' 問';
-  document.getElementById('q-sentence').innerHTML = q.sentence.replace(/\((.*?)\)/, '<span class="target-word">$1</span>');
-  document.getElementById('answer-panel').style.display = 'none';
-  document.getElementById('btn-check').style.display = 'inline-block';
-  clearCanvas();
-}
-
-function showAnswer() {
-  var q = currentQuestions[currentIndex];
-  document.getElementById('ans-kanji').innerText = q.answer;
-  document.getElementById('ans-reading').innerText = 'よみ: ' + q.reading;
-  document.getElementById('answer-panel').style.display = 'block';
-  document.getElementById('btn-check').style.display = 'none';
-}
-
-function evaluateResult(isCorrect) {
-  var q = currentQuestions[currentIndex];
-  var qNum = currentIndex + 1;
-  
-  if (isCorrect) {
-    sessionCorrectCount++;
-    sessionDetails.push(qNum + '問目: [小' + q.grade + '] ' + q.sentence + ' | 正解: ' + q.answer + ' | 結果: ⭕正解');
-  } else {
-    sessionDetails.push(qNum + '問目: [小' + q.grade + '] ' + q.sentence + ' | 正解: ' + q.answer + ' | 結果: ❌不正解');
-  }
-  currentIndex++;
-  renderQuestion();
-}
-
-function finishDrill() {
-  document.getElementById('main-card').style.display = 'none';
-  document.getElementById('clear-card').style.display = 'block';
-  document.getElementById('clear-date-text').innerText = selectedDateStr + ' のドリル完了！';
-  sendResultToSheet();
-}
-
-function sendResultToSheet() {
-  var statusElem = document.getElementById('send-status');
-  statusElem.innerText = "詳細な学習記録を送信中...";
-  
-  var payload = {
-    dateStr: selectedDateStr,
-    score: sessionCorrectCount,
-    total: currentQuestions.length,
-    details: sessionDetails
-  };
-
-  fetch(GOOGLE_SHEET_URL, {
-    method: 'POST',
-    mode: 'no-cors',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(payload)
-  }).then(function() {
-    statusElem.innerText = "✅ スプレッドシートへ詳細記録を送信完了！";
-  }).catch(function() {
-    statusElem.innerText = "⚠️ 送信できませんでした。";
-  });
-}
-
-// キャンバス描画機能
-var canvas, ctx, isDrawing = false;
-window.onload = function() {
-  canvas = document.getElementById('handwrite-canvas');
-  if (!canvas) return;
-  ctx = canvas.getContext('2d');
-  
-  canvas.addEventListener('mousedown', startDrawing);
-  canvas.addEventListener('mousemove', draw);
-  canvas.addEventListener('mouseup', stopDrawing);
-
-  canvas.addEventListener('touchstart', function(e) {
-    var t = e.touches[0];
-    startDrawing({ clientX: t.clientX, clientY: t.clientY });
-  });
-  canvas.addEventListener('touchmove', function(e) {
-    var t = e.touches[0];
-    draw({ clientX: t.clientX, clientY: t.clientY });
-  });
-  canvas.addEventListener('touchend', stopDrawing);
-};
-
-function startDrawing(e) {
-  isDrawing = true;
-  ctx.beginPath();
-  var rect = canvas.getBoundingClientRect();
-  ctx.moveTo(e.clientX - rect.left, e.clientY - rect.top);
-  ctx.lineWidth = 6;
-  ctx.lineCap = 'round';
-  ctx.strokeStyle = '#222';
-}
-
-function draw(e) {
-  if (!isDrawing) return;
-  var rect = canvas.getBoundingClientRect();
-  ctx.lineTo(e.clientX - rect.left, e.clientY - rect.top);
-  ctx.stroke();
-}
-
-function stopDrawing() { isDrawing = false; }
-
-function clearCanvas() {
-  if (!ctx) return;
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-  ctx.strokeStyle = '#e0e0e0';
-  ctx.lineWidth = 1;
-  ctx.beginPath();
-  ctx.moveTo(160, 0); ctx.lineTo(160, 160);
-  ctx.stroke();
-}
-</script>
-
-</body>
-</html>
+// 11/04 問題セット（全10問）
+var QUESTIONS_1104 = [
+  { grade: 4, sentence: "交易のために村人と
