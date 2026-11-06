@@ -67,21 +67,24 @@
       color: #ffffff;
       font-size: 20px;
       font-weight: bold;
-      padding: 16px 24px;
-      border: 3px solid #000;
+      padding: 18px 24px;
+      border: 4px solid #000;
       cursor: pointer;
       width: 100%;
       margin-top: 8px;
       display: block;
       text-align: center;
+      -webkit-tap-highlight-color: rgba(0,0,0,0);
+      user-select: none;
     }
 
     .btn-sub {
       background-color: #727272;
       color: #fff;
-      padding: 6px 12px;
+      padding: 8px 16px;
       border: 2px solid #000;
       cursor: pointer;
+      font-weight: bold;
     }
 
     .btn-gold { background-color: #c6a100; color: #000; }
@@ -139,19 +142,19 @@
       <!-- 11/06（本日分：復習12問） -->
       <div class="task-item">
         <div style="font-size:18px; margin-bottom:6px;">📅 <strong>2026-11-06 のドリル（復習12問）</strong></div>
-        <button class="btn-action" onclick="forceStartDrill('2026-11-06')">▶ 挑戦する（スタート）</button>
+        <button type="button" class="btn-action" onclick="forceStartDrill('2026-11-06');">▶ 挑戦する（スタート）</button>
       </div>
 
       <!-- 11/04（未実施：いつでも挑戦可能） -->
       <div class="task-item">
         <div style="font-size:18px; margin-bottom:6px;">📅 <strong>2026-11-04 のドリル（未実施）</strong></div>
-        <button class="btn-action" style="background-color:#c6a100; color:#000;" onclick="forceStartDrill('2026-11-04')">▶ 挑戦する（11/4分）</button>
+        <button type="button" class="btn-action" style="background-color:#c6a100; color:#000;" onclick="forceStartDrill('2026-11-04');">▶ 挑戦する（11/4分）</button>
       </div>
 
       <!-- 11/03（未実施：いつでも挑戦可能） -->
       <div class="task-item">
         <div style="font-size:18px; margin-bottom:6px;">📅 <strong>2026-11-03 のドリル（未実施）</strong></div>
-        <button class="btn-action" style="background-color:#c6a100; color:#000;" onclick="forceStartDrill('2026-11-03')">▶ 挑戦する（11/3分）</button>
+        <button type="button" class="btn-action" style="background-color:#c6a100; color:#000;" onclick="forceStartDrill('2026-11-03');">▶ 挑戦する（11/3分）</button>
       </div>
 
       <!-- 過去の完了済み -->
@@ -181,4 +184,262 @@
     <h4 style="color:#4cedd9; margin:0 0 8px 0;">🏆 クリアした日の記録（スタンプ帳）</h4>
     <div>
       <div class="history-item"><span>✅ 2026-11-05 ドリル達成！</span><span>💎 CLEAR</span></div>
-      <div class="history-item"><span>✅ 2026-11-02 ド
+      <div class="history-item"><span>✅ 2026-11-02 ドリル達成！</span><span>💎 CLEAR</span></div>
+      <div class="history-item"><span>✅ 2026-11-01 ドリル達成！</span><span>💎 CLEAR</span></div>
+      <div class="history-item"><span>✅ 2026-10-31 ドリル達成！</span><span>💎 CLEAR</span></div>
+    </div>
+  </div>
+
+  <!-- 問題カード -->
+  <div class="card" id="main-card" style="display:none;">
+    <div style="display:flex; justify-content:space-between; align-items:center;">
+      <button type="button" class="btn-sub" onclick="showMenu();">🔙 一覧へ</button>
+      <span id="q-number">第 1 / 12 問</span>
+    </div>
+
+    <div class="question-box" id="q-sentence">読み込み中...</div>
+
+    <!-- キャンバス -->
+    <div style="text-align:center; margin:10px 0;">
+      <canvas id="handwrite-canvas" width="320" height="160"></canvas>
+      <div style="margin-top:12px; display:flex; justify-content:center; gap:12px;">
+        <button type="button" class="btn-sub" onclick="clearCanvas();">🧼 けす</button>
+        <button type="button" class="btn-sub btn-gold" id="btn-check" onclick="showAnswer();">🔍 答えあわせ</button>
+      </div>
+    </div>
+
+    <!-- 答えあわせ -->
+    <div class="answer-panel" id="answer-panel">
+      <div>正解（せいかい）:</div>
+      <div class="answer-kanji" id="ans-kanji">差</div>
+      <div id="ans-reading" style="font-size:14px; color:#ccc; margin-bottom:8px;"></div>
+      <div style="display:flex; justify-content:center; gap:12px;">
+        <button type="button" class="btn-sub btn-green" onclick="evaluateResult(true);">⭕ 書けた！</button>
+        <button type="button" class="btn-sub btn-danger" onclick="evaluateResult(false);">❌ 書けなかった</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- クリア画面 -->
+  <div class="card" id="clear-card" style="display:none; text-align:center;">
+    <h2 style="color:#fdf55f;">🎉 クリアおめでとう！</h2>
+    <p id="clear-date-text"></p>
+    <div style="font-size:48px; margin:16px 0;">💎</div>
+    <p id="send-status" style="font-size:12px; color:#4cedd9;"></p>
+    <button type="button" class="btn-sub btn-green" onclick="showMenu();">ドリル一覧にもどる</button>
+  </div>
+</div>
+
+<script>
+var GOOGLE_SHEET_URL = "https://script.google.com/macros/s/AKfycbyU9y0O5XWXg9QJZ8FvzgY9iV0HTA1pwe7fydhLA8iCHPCYfzJtPkmupEZwK24NZBsW/exec";
+
+// 11/06 復習問題セット（全12問）
+var QUESTIONS_1106 = [
+  { grade: 4, sentence: "拠点に影が(サ)す。", target: "サ", answer: "差", reading: "さす" },
+  { grade: 4, sentence: "ネザー要塞の(イチ)を特定する。", target: "イチ", answer: "位置", reading: "いち" },
+  { grade: 4, sentence: "戦いの(ケッカ)を発表する。", target: "ケッカ", answer: "結果", reading: "けっか" },
+  { grade: 4, sentence: "川の溢れを防ぐ(チスイ)工事を行う。", target: "チスイ", answer: "治水", reading: "ちすい" },
+  { grade: 4, sentence: "設計図を(インサツ)して手元に置く。", target: "インサツ", answer: "印刷", reading: "いんさつ" },
+  { grade: 4, sentence: "(シュウマツ)に大きな建築に取りかかる。", target: "シュウマツ", answer: "週末", reading: "しゅうまつ" },
+  { grade: 4, sentence: "攻略本の(タンコウボン)を読む。", target: "タンコウボン", answer: "単行本", reading: "たんこうぼん" },
+  { grade: 4, sentence: "村人たちの(ガッショウダン)を作る。", target: "ガッショウダン", answer: "合唱団", reading: "がっしょうだん" },
+  { grade: 4, sentence: "水流の滝を(アビ)る。", target: "アビ", answer: "浴", reading: "あびる" },
+  { grade: 4, sentence: "ロープをしっかり(ムス)ぶ。", target: "ムス", answer: "結", reading: "むすぶ" },
+  { grade: 4, sentence: "目的を無事に(ハタ)す。", target: "ハタ", answer: "果", reading: "はたす" },
+  { grade: 4, sentence: "体調を戻して風邪を(ナオ)す。", target: "ナオ", answer: "治", reading: "なおす" }
+];
+
+// 11/04 問題セット（全10問）
+var QUESTIONS_1104 = [
+  { grade: 4, sentence: "交易のために村人と(ヤクソク)を交わす。", target: "ヤクソク", answer: "約束", reading: "やくそく" },
+  { grade: 4, sentence: "ダイヤモンドの剣を(アイヨウ)する。", target: "アイヨウ", answer: "愛用", reading: "あいよう" },
+  { grade: 4, sentence: "遠くの村までエリトラで(ヒコウ)する。", target: "ヒコウ", answer: "飛行", reading: "ひこう" },
+  { grade: 4, sentence: "自動農園の仕組みを(カンセイ)させる。", target: "カンセイ", answer: "完成", reading: "かんせい" },
+  { grade: 4, sentence: "ダイヤの防具で防御を(カタ)める。", target: "カタ", answer: "固", reading: "かためる" },
+  { grade: 3, sentence: "巨大な拠点の(イノチ)とも言える動力回路。", target: "イノチ", answer: "命", reading: "いのち" },
+  { grade: 3, sentence: "拠点への危険な敵の侵入を(フセ)ぐ。", target: "フセ", answer: "防", reading: "ふせぐ" },
+  { grade: 2, sentence: "ネザーの暗闇を松明で(アカル)く照らす。", target: "アカル", answer: "明", reading: "あかるく" },
+  { grade: 4, sentence: "洞窟の奥深くまで(タンケン)を進める。", target: "タンケン", answer: "探検", reading: "たんけん" },
+  { grade: 4, sentence: "村人から特別なエンチャント本を(コウカン)する。", target: "コウカン", answer: "交換", reading: "こうかん" }
+];
+
+// 11/03 問題セット（全10問）
+var QUESTIONS_1103 = [
+  { grade: 3, sentence: "ネザー要塞でブレイズの(イノチ)をねらう。", target: "イノチ", answer: "命", reading: "いのち" },
+  { grade: 4, sentence: "(ユウキ)を出してエンドドラゴンに挑む。", target: "ユウキ", answer: "勇気", reading: "ゆうき" },
+  { grade: 4, sentence: "不要なアイテムをエメラルドに(ヘンカン)する。", target: "ヘンカン", answer: "変換", reading: "へんかん" },
+  { grade: 4, sentence: "仲間の作業を(テツダ)う。", target: "テツダ", answer: "手伝", reading: "てつだう" },
+  { grade: 3, sentence: "クリーパーの爆発から(シナモノ)を守る。", target: "シナモノ", answer: "品物", reading: "しなもの" },
+  { grade: 4, sentence: "(トクベツ)なエンチャント本を入手する。", target: "トクベツ", answer: "特別", reading: "とくべつ" },
+  { grade: 4, sentence: "難関ダンジョンの攻略に(セイコウ)する。", target: "セイコウ", answer: "成功", reading: "せいこう" },
+  { grade: 4, sentence: "拠点に頑丈な家を(タテ)てる。", target: "タテ", answer: "建", reading: "たてる" },
+  { grade: 2, sentence: "拠点までの安全な(ミチ)を整備する。", target: "ミチ", answer: "道", reading: "みち" },
+  { grade: 3, sentence: "(アタラ)しいエンダーチェストを開く。", target: "アタラ", answer: "新", reading: "あたらしい" }
+];
+
+var selectedDateStr = "";
+var currentQuestions = [];
+var currentIndex = 0;
+var sessionCorrectCount = 0;
+var sessionDetails = [];
+
+function forceStartDrill(dateStr) {
+  selectedDateStr = dateStr;
+  currentIndex = 0;
+  sessionCorrectCount = 0;
+  sessionDetails = [];
+
+  if (dateStr === '2026-11-06') {
+    currentQuestions = QUESTIONS_1106;
+  } else if (dateStr === '2026-11-04') {
+    currentQuestions = QUESTIONS_1104;
+  } else if (dateStr === '2026-11-03') {
+    currentQuestions = QUESTIONS_1103;
+  }
+
+  var sCard = document.getElementById('select-card');
+  var cCard = document.getElementById('clear-card');
+  var mCard = document.getElementById('main-card');
+
+  if (sCard) sCard.style.display = 'none';
+  if (cCard) cCard.style.display = 'none';
+  if (mCard) mCard.style.display = 'block';
+
+  renderQuestion();
+}
+
+function showMenu() {
+  var sCard = document.getElementById('select-card');
+  var cCard = document.getElementById('clear-card');
+  var mCard = document.getElementById('main-card');
+
+  if (mCard) mCard.style.display = 'none';
+  if (cCard) cCard.style.display = 'none';
+  if (sCard) sCard.style.display = 'block';
+}
+
+function renderQuestion() {
+  if (currentIndex >= currentQuestions.length) {
+    finishDrill();
+    return;
+  }
+
+  var q = currentQuestions[currentIndex];
+  document.getElementById('q-number').innerText = '第 ' + (currentIndex + 1) + ' / ' + currentQuestions.length + ' 問';
+  document.getElementById('q-sentence').innerHTML = q.sentence.replace(/\((.*?)\)/, '<span class="target-word">$1</span>');
+  document.getElementById('answer-panel').style.display = 'none';
+  document.getElementById('btn-check').style.display = 'inline-block';
+  clearCanvas();
+}
+
+function showAnswer() {
+  var q = currentQuestions[currentIndex];
+  document.getElementById('ans-kanji').innerText = q.answer;
+  document.getElementById('ans-reading').innerText = 'よみ: ' + q.reading;
+  document.getElementById('answer-panel').style.display = 'block';
+  document.getElementById('btn-check').style.display = 'none';
+}
+
+function evaluateResult(isCorrect) {
+  var q = currentQuestions[currentIndex];
+  var qNum = currentIndex + 1;
+  
+  if (isCorrect) {
+    sessionCorrectCount++;
+    sessionDetails.push(qNum + '問目: [小' + q.grade + '] ' + q.sentence + ' | 正解: ' + q.answer + ' | 結果: ⭕正解');
+  } else {
+    sessionDetails.push(qNum + '問目: [小' + q.grade + '] ' + q.sentence + ' | 正解: ' + q.answer + ' | 結果: ❌不正解');
+  }
+  currentIndex++;
+  renderQuestion();
+}
+
+function finishDrill() {
+  var mCard = document.getElementById('main-card');
+  var cCard = document.getElementById('clear-card');
+  if (mCard) mCard.style.display = 'none';
+  if (cCard) cCard.style.display = 'block';
+  
+  document.getElementById('clear-date-text').innerText = selectedDateStr + ' のドリル完了！';
+  sendResultToSheet();
+}
+
+function sendResultToSheet() {
+  var statusElem = document.getElementById('send-status');
+  if (statusElem) statusElem.innerText = "詳細な学習記録を送信中...";
+  
+  var payload = {
+    dateStr: selectedDateStr,
+    score: sessionCorrectCount,
+    total: currentQuestions.length,
+    details: sessionDetails
+  };
+
+  fetch(GOOGLE_SHEET_URL, {
+    method: 'POST',
+    mode: 'no-cors',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload)
+  }).then(function() {
+    if (statusElem) statusElem.innerText = "✅ スプレッドシートへ詳細記録を送信完了！";
+  }).catch(function() {
+    if (statusElem) statusElem.innerText = "⚠️ 送信できませんでした。";
+  });
+}
+
+// キャンバス描画機能
+var canvas, ctx, isDrawing = false;
+window.onload = function() {
+  canvas = document.getElementById('handwrite-canvas');
+  if (!canvas) return;
+  ctx = canvas.getContext('2d');
+  
+  canvas.addEventListener('mousedown', startDrawing);
+  canvas.addEventListener('mousemove', draw);
+  canvas.addEventListener('mouseup', stopDrawing);
+
+  canvas.addEventListener('touchstart', function(e) {
+    var t = e.touches[0];
+    startDrawing({ clientX: t.clientX, clientY: t.clientY });
+  }, {passive: true});
+  
+  canvas.addEventListener('touchmove', function(e) {
+    var t = e.touches[0];
+    draw({ clientX: t.clientX, clientY: t.clientY });
+  }, {passive: true});
+  
+  canvas.addEventListener('touchend', stopDrawing);
+};
+
+function startDrawing(e) {
+  isDrawing = true;
+  ctx.beginPath();
+  var rect = canvas.getBoundingClientRect();
+  ctx.moveTo(e.clientX - rect.left, e.clientY - rect.top);
+  ctx.lineWidth = 6;
+  ctx.lineCap = 'round';
+  ctx.strokeStyle = '#222';
+}
+
+function draw(e) {
+  if (!isDrawing) return;
+  var rect = canvas.getBoundingClientRect();
+  ctx.lineTo(e.clientX - rect.left, e.clientY - rect.top);
+  ctx.stroke();
+}
+
+function stopDrawing() { isDrawing = false; }
+
+function clearCanvas() {
+  if (!ctx) return;
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  ctx.strokeStyle = '#e0e0e0';
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.moveTo(160, 0); ctx.lineTo(160, 160);
+  ctx.stroke();
+}
+</script>
+
+</body>
+</html>
