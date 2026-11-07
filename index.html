@@ -131,7 +131,7 @@
   <!-- ヘッダー -->
   <div class="header-bar">
     <div>⛏️ LEVEL: <span style="color:#fdf55f;">1</span></div>
-    <div>🔥 頑張った日数: <span style="color:#4cedd9;">4日</span></div>
+    <div>🔥 頑張った日数: <span style="color:#4cedd9;">5日</span></div>
   </div>
 
   <!-- トップ画面 -->
@@ -139,10 +139,16 @@
     <h3 style="color:#fdf55f; margin:0 0 12px 0;">📜 今日のドリルを選ぼう！</h3>
     
     <div>
-      <!-- 11/06（本日分：復習12問） -->
+      <!-- 11/07（本日分：11/5問題限定 12問） -->
       <div class="task-item">
-        <div style="font-size:18px; margin-bottom:6px;">📅 <strong>2026-11-06 のドリル（復習12問）</strong></div>
-        <button type="button" class="btn-action" onclick="forceStartDrill('2026-11-06');">▶ 挑戦する（スタート）</button>
+        <div style="font-size:18px; margin-bottom:6px;">📅 <strong>2026-11-07 のドリル（12問）</strong></div>
+        <button type="button" class="btn-action" onclick="forceStartDrill('2026-11-07');">▶ 挑戦する（スタート）</button>
+      </div>
+
+      <!-- 過去の完了済み -->
+      <div class="task-item">
+        <div>📅 <strong>2026-11-06 のドリル</strong></div>
+        <div style="color:#aaa; font-weight:bold;">✅ 完了済み (10/12正解)</div>
       </div>
 
       <!-- 11/04（未実施：いつでも挑戦可能） -->
@@ -157,7 +163,6 @@
         <button type="button" class="btn-action" style="background-color:#c6a100; color:#000;" onclick="forceStartDrill('2026-11-03');">▶ 挑戦する（11/3分）</button>
       </div>
 
-      <!-- 過去の完了済み -->
       <div class="task-item">
         <div>📅 <strong>2026-11-05 のドリル</strong></div>
         <div style="color:#aaa; font-weight:bold;">✅ 完了済み (9/17正解)</div>
@@ -183,6 +188,7 @@
 
     <h4 style="color:#4cedd9; margin:0 0 8px 0;">🏆 クリアした日の記録（スタンプ帳）</h4>
     <div>
+      <div class="history-item"><span>✅ 2026-11-06 ドリル達成！</span><span>💎 CLEAR</span></div>
       <div class="history-item"><span>✅ 2026-11-05 ドリル達成！</span><span>💎 CLEAR</span></div>
       <div class="history-item"><span>✅ 2026-11-02 ドリル達成！</span><span>💎 CLEAR</span></div>
       <div class="history-item"><span>✅ 2026-11-01 ドリル達成！</span><span>💎 CLEAR</span></div>
@@ -211,7 +217,7 @@
     <!-- 答えあわせ -->
     <div class="answer-panel" id="answer-panel">
       <div>正解（せいかい）:</div>
-      <div class="answer-kanji" id="ans-kanji">差</div>
+      <div class="answer-kanji" id="ans-kanji">週末</div>
       <div id="ans-reading" style="font-size:14px; color:#ccc; margin-bottom:8px;"></div>
       <div style="display:flex; justify-content:center; gap:12px;">
         <button type="button" class="btn-sub btn-green" onclick="evaluateResult(true);">⭕ 書けた！</button>
@@ -233,20 +239,20 @@
 <script>
 var GOOGLE_SHEET_URL = "https://script.google.com/macros/s/AKfycbyU9y0O5XWXg9QJZ8FvzgY9iV0HTA1pwe7fydhLA8iCHPCYfzJtPkmupEZwK24NZBsW/exec";
 
-// 11/06 復習問題セット（全12問）
-var QUESTIONS_1106 = [
-  { grade: 4, sentence: "拠点に影が(サ)す。", target: "サ", answer: "差", reading: "さす" },
-  { grade: 4, sentence: "ネザー要塞の(イチ)を特定する。", target: "イチ", answer: "位置", reading: "いち" },
-  { grade: 4, sentence: "戦いの(ケッカ)を発表する。", target: "ケッカ", answer: "結果", reading: "けっか" },
-  { grade: 4, sentence: "川の溢れを防ぐ(チスイ)工事を行う。", target: "チスイ", answer: "治水", reading: "ちすい" },
-  { grade: 4, sentence: "設計図を(インサツ)して手元に置く。", target: "インサツ", answer: "印刷", reading: "いんさつ" },
+// 11/07 11/5問題限定セット（全12問）
+var QUESTIONS_1107 = [
   { grade: 4, sentence: "(シュウマツ)に大きな建築に取りかかる。", target: "シュウマツ", answer: "週末", reading: "しゅうまつ" },
-  { grade: 4, sentence: "攻略本の(タンコウボン)を読む。", target: "タンコウボン", answer: "単行本", reading: "たんこうぼん" },
   { grade: 4, sentence: "村人たちの(ガッショウダン)を作る。", target: "ガッショウダン", answer: "合唱団", reading: "がっしょうだん" },
-  { grade: 4, sentence: "水流の滝を(アビ)る。", target: "アビ", answer: "浴", reading: "あびる" },
+  { grade: 4, sentence: "(ネン)のためチェストに鍵をかける。", target: "ネン", answer: "念", reading: "ねん" },
+  { grade: 4, sentence: "建築の作品を(ハク)覧会に出品する。", target: "ハク", answer: "博", reading: "はくらんかい" },
+  { grade: 4, sentence: "ネザー要塞の(イチ)を特定する。", target: "イチ", answer: "位置", reading: "いち" },
+  { grade: 4, sentence: "マルチプレイで(シュッケツ)を確認する。", target: "シュッケツ", answer: "出欠", reading: "しゅっけつ" },
+  { grade: 4, sentence: "戦いの(ケッカ)を発表する。", target: "ケッカ", answer: "結果", reading: "けっか" },
+  { grade: 4, sentence: "村の(ダイジン)と会話する。", target: "ダイジン", answer: "大臣", reading: "だいじん" },
+  { grade: 4, sentence: "設計図を(インサツ)して手元に置く。", target: "インサツ", answer: "印刷", reading: "いんさつ" },
   { grade: 4, sentence: "ロープをしっかり(ムス)ぶ。", target: "ムス", answer: "結", reading: "むすぶ" },
-  { grade: 4, sentence: "目的を無事に(ハタ)す。", target: "ハタ", answer: "果", reading: "はたす" },
-  { grade: 4, sentence: "体調を戻して風邪を(ナオ)す。", target: "ナオ", answer: "治", reading: "なおす" }
+  { grade: 4, sentence: "冒険の旅がまだまだ(ツヅ)く。", target: "ツヅ", answer: "続", reading: "つづく" },
+  { grade: 4, sentence: "拠点に影が(サ)す。", target: "サ", answer: "差", reading: "さす" }
 ];
 
 // 11/04 問題セット（全10問）
@@ -289,8 +295,8 @@ function forceStartDrill(dateStr) {
   sessionCorrectCount = 0;
   sessionDetails = [];
 
-  if (dateStr === '2026-11-06') {
-    currentQuestions = QUESTIONS_1106;
+  if (dateStr === '2026-11-07') {
+    currentQuestions = QUESTIONS_1107;
   } else if (dateStr === '2026-11-04') {
     currentQuestions = QUESTIONS_1104;
   } else if (dateStr === '2026-11-03') {
