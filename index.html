@@ -145,10 +145,10 @@
         <button type="button" class="btn-action" onclick="forceStartDrill('2026-11-08');">▶ 挑戦する（スタート）</button>
       </div>
 
-      <!-- 11/07（完了済み） -->
+      <!-- 11/07（完了済み：正解数つき） -->
       <div class="task-item">
         <div>📅 <strong>2026-11-07 のドリル</strong></div>
-        <div style="color:#aaa; font-weight:bold;">✅ 完了済み</div>
+        <div style="color:#aaa; font-weight:bold;">✅ 完了済み (12/12正解)</div>
       </div>
 
       <!-- 11/06（完了済み） -->
@@ -197,4 +197,63 @@
       <div class="history-item"><span>✅ 2026-11-07 ドリル達成！</span><span>💎 CLEAR</span></div>
       <div class="history-item"><span>✅ 2026-11-06 ドリル達成！</span><span>💎 CLEAR</span></div>
       <div class="history-item"><span>✅ 2026-11-05 ドリル達成！</span><span>💎 CLEAR</span></div>
-      <div class="
+      <div class="history-item"><span>✅ 2026-11-02 ドリル達成！</span><span>💎 CLEAR</span></div>
+      <div class="history-item"><span>✅ 2026-11-01 ドリル達成！</span><span>💎 CLEAR</span></div>
+      <div class="history-item"><span>✅ 2026-10-31 ドリル達成！</span><span>💎 CLEAR</span></div>
+    </div>
+  </div>
+
+  <!-- 問題カード -->
+  <div class="card" id="main-card" style="display:none;">
+    <div style="display:flex; justify-content:space-between; align-items:center;">
+      <button type="button" class="btn-sub" onclick="showMenu();">🔙 一覧へ</button>
+      <span id="q-number">第 1 / 12 問</span>
+    </div>
+
+    <div class="question-box" id="q-sentence">読み込み中...</div>
+
+    <!-- キャンバス -->
+    <div style="text-align:center; margin:10px 0;">
+      <canvas id="handwrite-canvas" width="320" height="160"></canvas>
+      <div style="margin-top:12px; display:flex; justify-content:center; gap:12px;">
+        <button type="button" class="btn-sub" onclick="clearCanvas();">🧼 けす</button>
+        <button type="button" class="btn-sub btn-gold" id="btn-check" onclick="showAnswer();">🔍 答えあわせ</button>
+      </div>
+    </div>
+
+    <!-- 答えあわせ -->
+    <div class="answer-panel" id="answer-panel">
+      <div>正解（せいかい）:</div>
+      <div class="answer-kanji" id="ans-kanji">週末</div>
+      <div id="ans-reading" style="font-size:14px; color:#ccc; margin-bottom:8px;"></div>
+      <div style="display:flex; justify-content:center; gap:12px;">
+        <button type="button" class="btn-sub btn-green" onclick="evaluateResult(true);">⭕ 書けた！</button>
+        <button type="button" class="btn-sub btn-danger" onclick="evaluateResult(false);">❌ 書けなかった</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- クリア画面 -->
+  <div class="card" id="clear-card" style="display:none; text-align:center;">
+    <h2 style="color:#fdf55f;">🎉 クリアおめでとう！</h2>
+    <p id="clear-date-text"></p>
+    <div style="font-size:48px; margin:16px 0;">💎</div>
+    <p id="send-status" style="font-size:12px; color:#4cedd9;"></p>
+    <button type="button" class="btn-sub btn-green" onclick="showMenu();">ドリル一覧にもどる</button>
+  </div>
+</div>
+
+<script>
+var GOOGLE_SHEET_URL = "https://script.google.com/macros/s/AKfycbyU9y0O5XWXg9QJZ8FvzgY9iV0HTA1pwe7fydhLA8iCHPCYfzJtPkmupEZwK24NZBsW/exec";
+
+// 11/08 復習問題セット（全12問）
+var QUESTIONS_1108 = [
+  { grade: 4, sentence: "(シュウマツ)に大きな建築に取りかかる。", target: "シュウマツ", answer: "週末", reading: "しゅうまつ" },
+  { grade: 4, sentence: "村人たちの(ガッショウダン)を作る。", target: "ガッショウダン", answer: "合唱団", reading: "がっしょうだん" },
+  { grade: 4, sentence: "川の溢れを防ぐ(チスイ)工事を行う。", target: "チスイ", answer: "治水", reading: "ちすい" },
+  { grade: 4, sentence: "攻略本の(タンコウボン)を読む。", target: "タンコウボン", answer: "単行本", reading: "たんこうぼん" },
+  { grade: 4, sentence: "水流の滝を(アビ)る。", target: "アビ", answer: "浴", reading: "あびる" },
+  { grade: 4, sentence: "目的を無事に(ハタ)す。", target: "ハタ", answer: "果", reading: "はたす" },
+  { grade: 4, sentence: "体調を戻して風邪を(ナオ)す。", target: "ナオ", answer: "治", reading: "なおす" },
+  { grade: 4, sentence: "(ネン)のためチェストに鍵をかける。", target: "ネン", answer: "念", reading: "ねん" },
+  { grade: 4, sentence: "建築の作品を(ハク)覧会に出品する
