@@ -142,7 +142,7 @@
       <!-- 11/08（本日分：12問） -->
       <div class="task-item">
         <div style="font-size:18px; margin-bottom:6px;">📅 <strong>2026-11-08 のドリル（12問）</strong></div>
-        <button type="button" class="btn-action" onclick="document.getElementById('select-card').style.display='none'; document.getElementById('main-card').style.display='block'; startApp('2026-11-08');">▶ 挑戦する（スタート）</button>
+        <button type="button" class="btn-action" onclick="startApp('2026-11-08');">▶ 挑戦する（スタート）</button>
       </div>
 
       <!-- 11/07（完了済み） -->
@@ -160,13 +160,13 @@
       <!-- 11/04（未実施） -->
       <div class="task-item">
         <div style="font-size:18px; margin-bottom:6px;">📅 <strong>2026-11-04 のドリル（未実施）</strong></div>
-        <button type="button" class="btn-action" style="background-color:#c6a100; color:#000;" onclick="document.getElementById('select-card').style.display='none'; document.getElementById('main-card').style.display='block'; startApp('2026-11-04');">▶ 挑戦する（11/4分）</button>
+        <button type="button" class="btn-action" style="background-color:#c6a100; color:#000;" onclick="startApp('2026-11-04');">▶ 挑戦する（11/4分）</button>
       </div>
 
       <!-- 11/03（未実施） -->
       <div class="task-item">
         <div style="font-size:18px; margin-bottom:6px;">📅 <strong>2026-11-03 のドリル（未実施）</strong></div>
-        <button type="button" class="btn-action" style="background-color:#c6a100; color:#000;" onclick="document.getElementById('select-card').style.display='none'; document.getElementById('main-card').style.display='block'; startApp('2026-11-03');">▶ 挑戦する（11/3分）</button>
+        <button type="button" class="btn-action" style="background-color:#c6a100; color:#000;" onclick="startApp('2026-11-03');">▶ 挑戦する（11/3分）</button>
       </div>
 
       <div class="task-item">
@@ -210,7 +210,7 @@
       <span id="q-number">第 1 / 12 問</span>
     </div>
 
-    <div class="question-box" id="q-sentence">読み込み中...</div>
+    <div class="question-box" id="q-sentence"></div>
 
     <!-- キャンバス -->
     <div style="text-align:center; margin:10px 0;">
@@ -263,4 +263,101 @@ var QUESTIONS_1108 = [
 
 var QUESTIONS_1104 = [
   { grade: 4, sentence: "交易のために村人と(ヤクソク)を交わす。", target: "ヤクソク", answer: "約束", reading: "やくそく" },
-  { grade: 4, sentence:
+  { grade: 4, sentence: "ダイヤモンドの剣を(アイヨウ)する。", target: "アイヨウ", answer: "愛用", reading: "あいよう" },
+  { grade: 4, sentence: "遠くの村までエリトラで(ヒコウ)する。", target: "ヒコウ", answer: "飛行", reading: "ひこう" },
+  { grade: 4, sentence: "自動農園の仕組みを(カンセイ)させる。", target: "カンセイ", answer: "完成", reading: "かんせい" },
+  { grade: 4, sentence: "ダイヤの防具で防御を(カタ)める。", target: "カタ", answer: "固", reading: "かためる" },
+  { grade: 3, sentence: "巨大な拠点の(イノチ)とも言える動力回路。", target: "イノチ", answer: "命", reading: "いのち" },
+  { grade: 3, sentence: "拠点への危険な敵の侵入を(フセ)ぐ。", target: "フセ", answer: "防", reading: "ふせぐ" },
+  { grade: 2, sentence: "ネザーの暗闇を松明で(アカル)く照らす。", target: "アカル", answer: "明", reading: "あかるく" },
+  { grade: 4, sentence: "洞窟の奥深くまで(タンケン)を進める。", target: "タンケン", answer: "探検", reading: "たんけん" },
+  { grade: 4, sentence: "村人から特別なエンチャント本を(コウカン)する。", target: "コウカン", answer: "交換", reading: "こうかん" }
+];
+
+var QUESTIONS_1103 = [
+  { grade: 3, sentence: "ネザー要塞でブレイズの(イノチ)をねらう。", target: "イノチ", answer: "命", reading: "いのち" },
+  { grade: 4, sentence: "(ユウキ)を出してエンドドラゴンに挑む。", target: "ユウキ", answer: "勇気", reading: "ゆうき" },
+  { grade: 4, sentence: "不要なアイテムをエメラルドに(ヘンカン)する。", target: "ヘンカン", answer: "変換", reading: "へんかん" },
+  { grade: 4, sentence: "仲間の作業を(テツダ)う。", target: "テツダ", answer: "手伝", reading: "てつだう" },
+  { grade: 3, sentence: "クリーパーの爆発から(シナモノ)を守る。", target: "シナモノ", answer: "品物", reading: "しなもの" },
+  { grade: 4, sentence: "(トクベツ)なエンチャント本を入手する。", target: "トクベツ", answer: "特別", reading: "とくべつ" },
+  { grade: 4, sentence: "難関ダンジョンの攻略に(セイコウ)する。", target: "セイコウ", answer: "成功", reading: "せいこう" },
+  { grade: 4, sentence: "拠点に頑丈な家を(タテ)てる。", target: "タテ", answer: "建", reading: "たてる" },
+  { grade: 2, sentence: "拠点までの安全な(ミチ)を整備する。", target: "ミチ", answer: "道", reading: "みち" },
+  { grade: 3, sentence: "(アタラ)しいエンダーチェストを開く。", target: "アタラ", answer: "新", reading: "あたらしい" }
+];
+
+var selectedDateStr = "";
+var currentQuestions = [];
+var currentIndex = 0;
+var sessionCorrectCount = 0;
+var sessionDetails = [];
+
+function startApp(dateStr) {
+  selectedDateStr = dateStr;
+  currentIndex = 0;
+  sessionCorrectCount = 0;
+  sessionDetails = [];
+
+  if (dateStr === '2026-11-08') {
+    currentQuestions = QUESTIONS_1108;
+  } else if (dateStr === '2026-11-04') {
+    currentQuestions = QUESTIONS_1104;
+  } else if (dateStr === '2026-11-03') {
+    currentQuestions = QUESTIONS_1103;
+  }
+
+  document.getElementById('select-card').style.display = 'none';
+  document.getElementById('clear-card').style.display = 'none';
+  document.getElementById('main-card').style.display = 'block';
+
+  initCanvasIfNeeded();
+  renderQuestion();
+}
+
+function showMenu() {
+  document.getElementById('main-card').style.display = 'none';
+  document.getElementById('clear-card').style.display = 'none';
+  document.getElementById('select-card').style.display = 'block';
+}
+
+function renderQuestion() {
+  if (currentIndex >= currentQuestions.length) {
+    finishDrill();
+    return;
+  }
+
+  var q = currentQuestions[currentIndex];
+  document.getElementById('q-number').innerText = '第 ' + (currentIndex + 1) + ' / ' + currentQuestions.length + ' 問';
+  document.getElementById('q-sentence').innerHTML = q.sentence.replace(/\((.*?)\)/, '<span class="target-word">$1</span>');
+  document.getElementById('answer-panel').style.display = 'none';
+  document.getElementById('btn-check').style.display = 'inline-block';
+  clearCanvas();
+}
+
+function showAnswer() {
+  var q = currentQuestions[currentIndex];
+  document.getElementById('ans-kanji').innerText = q.answer;
+  document.getElementById('ans-reading').innerText = 'よみ: ' + q.reading;
+  document.getElementById('answer-panel').style.display = 'block';
+  document.getElementById('btn-check').style.display = 'none';
+}
+
+function evaluateResult(isCorrect) {
+  var q = currentQuestions[currentIndex];
+  var qNum = currentIndex + 1;
+  
+  if (isCorrect) {
+    sessionCorrectCount++;
+    sessionDetails.push(qNum + '問目: [小' + q.grade + '] ' + q.sentence + ' | 正解: ' + q.answer + ' | 結果: ⭕正解');
+  } else {
+    sessionDetails.push(qNum + '問目: [小' + q.grade + '] ' + q.sentence + ' | 正解: ' + q.answer + ' | 結果: ❌不正解');
+  }
+  currentIndex++;
+  renderQuestion();
+}
+
+function finishDrill() {
+  document.getElementById('main-card').style.display = 'none';
+  document.getElementById('clear-card').style.display = 'block';
+  document.getElementById('
