@@ -142,7 +142,7 @@
       <!-- 11/10（本日分：12問） -->
       <div class="task-item">
         <div style="font-size:18px; margin-bottom:6px;">📅 <strong>2026-11-10 のドリル（12問）</strong></div>
-        <button type="button" class="btn-action" onclick="runDrill('2026-11-10');">▶ 挑戦する（スタート）</button>
+        <button type="button" class="btn-action" onclick="startDrillNow('2026-11-10');">▶ 挑戦する（スタート）</button>
       </div>
 
       <!-- 11/09（完了済み） -->
@@ -160,4 +160,79 @@
       <!-- 11/06（完了済み） -->
       <div class="task-item">
         <div>📅 <strong>2026-11-06 のドリル</strong></div>
-        <div style="color:#aaa; font-
+        <div style="color:#aaa; font-weight:bold;">✅ 完了済み (10/12正解)</div>
+      </div>
+
+      <!-- 11/05（完了済み） -->
+      <div class="task-item">
+        <div>📅 <strong>2026-11-05 のドリル</strong></div>
+        <div style="color:#aaa; font-weight:bold;">✅ 完了済み (9/17正解)</div>
+      </div>
+
+      <!-- 未実施分 -->
+      <div class="task-item">
+        <div style="font-size:18px; margin-bottom:6px;">📅 <strong>2026-11-04 のドリル（未実施）</strong></div>
+        <button type="button" class="btn-action" style="background-color:#c6a100; color:#000;" onclick="startDrillNow('2026-11-04');">▶ 挑戦する（11/4分）</button>
+      </div>
+
+      <div class="task-item">
+        <div style="font-size:18px; margin-bottom:6px;">📅 <strong>2026-11-03 のドリル（未実施）</strong></div>
+        <button type="button" class="btn-action" style="background-color:#c6a100; color:#000;" onclick="startDrillNow('2026-11-03');">▶ 挑戦する（11/3分）</button>
+      </div>
+
+      <!-- 11/02以前（完了済み） -->
+      <div class="task-item">
+        <div>📅 <strong>2026-11-02 のドリル</strong></div>
+        <div style="color:#aaa; font-weight:bold;">✅ 完了済み (2/10正解)</div>
+      </div>
+
+      <div class="task-item">
+        <div>📅 <strong>2026-11-01 のドリル</strong></div>
+        <div style="color:#aaa; font-weight:bold;">✅ 完了済み (1/10正解)</div>
+      </div>
+
+      <div class="task-item">
+        <div>📅 <strong>2026-10-31 のドリル</strong></div>
+        <div style="color:#aaa; font-weight:bold;">✅ 完了済み (3/10正解)</div>
+      </div>
+    </div>
+
+    <hr style="border-color:#494038; margin:16px 0 12px 0;">
+
+    <h4 style="color:#4cedd9; margin:0 0 8px 0;">🏆 クリアした日の記録（スタンプ帳）</h4>
+    <div>
+      <div class="history-item"><span>✅ 2026-11-09 ドリル達成！</span><span>💎 CLEAR</span></div>
+      <div class="history-item"><span>✅ 2026-11-07 ドリル達成！</span><span>💎 CLEAR</span></div>
+      <div class="history-item"><span>✅ 2026-11-06 ドリル達成！</span><span>💎 CLEAR</span></div>
+      <div class="history-item"><span>✅ 2026-11-05 ドリル達成！</span><span>💎 CLEAR</span></div>
+      <div class="history-item"><span>✅ 2026-11-02 ドリル達成！</span><span>💎 CLEAR</span></div>
+      <div class="history-item"><span>✅ 2026-11-01 ドリル達成！</span><span>💎 CLEAR</span></div>
+      <div class="history-item"><span>✅ 2026-10-31 ドリル達成！</span><span>💎 CLEAR</span></div>
+    </div>
+  </div>
+
+  <!-- 問題カード -->
+  <div class="card" id="main-card" style="display:none;">
+    <div style="display:flex; justify-content:space-between; align-items:center;">
+      <button type="button" class="btn-sub" onclick="showMenu();">🔙 一覧へ</button>
+      <span id="q-number">第 1 問</span>
+    </div>
+
+    <div class="question-box" id="q-sentence"></div>
+
+    <!-- キャンバス -->
+    <div style="text-align:center; margin:10px 0;">
+      <canvas id="handwrite-canvas" width="320" height="160"></canvas>
+      <div style="margin-top:12px; display:flex; justify-content:center; gap:12px;">
+        <button type="button" class="btn-sub" onclick="clearCanvas();">🧼 けす</button>
+        <button type="button" class="btn-sub btn-gold" id="btn-check" onclick="showAnswer();">🔍 答えあわせ</button>
+      </div>
+    </div>
+
+    <!-- 答えあわせ -->
+    <div class="answer-panel" id="answer-panel">
+      <div>正解（せいかい）:</div>
+      <div class="answer-kanji" id="ans-kanji">週末</div>
+      <div id="ans-reading" style="font-size:14px; color:#ccc; margin-bottom:8px;"></div>
+      <div style="display:flex; justify-content:center; gap:12px;">
+        <button type="button" class="btn-sub btn-green" onclick="evaluateResult(true);">⭕ 書けた！</button>
