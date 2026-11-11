@@ -5,11 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>マイクラ風 漢字ドリル</title>
   <style>
-    * {
-      box-sizing: border-box;
-      -webkit-tap-highlight-color: transparent;
-    }
-
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
     body {
       margin: 0;
       padding: 16px;
@@ -19,7 +15,6 @@
       display: flex;
       justify-content: center;
     }
-
     .app-container {
       width: 100%;
       max-width: 600px;
@@ -27,7 +22,6 @@
       border: 4px solid #191613;
       padding: 16px;
     }
-
     .header-bar {
       display: flex;
       justify-content: space-between;
@@ -37,14 +31,12 @@
       margin-bottom: 16px;
       font-weight: bold;
     }
-
     .card {
       background-color: #3b352f;
       border: 3px solid #191613;
       padding: 16px;
       margin-bottom: 12px;
     }
-
     .question-box {
       font-size: 20px;
       line-height: 1.6;
@@ -53,20 +45,17 @@
       padding: 12px;
       border: 2px solid #1a1714;
     }
-
     .target-word {
       color: #fdf55f;
       border-bottom: 3px dashed #fdf55f;
       font-weight: bold;
     }
-
     canvas {
       background: #ffffff;
       border: 4px solid #866043;
       touch-action: none;
       border-radius: 4px;
     }
-
     .btn-action {
       background-color: #4a7c29;
       color: #ffffff;
@@ -81,7 +70,6 @@
       text-align: center;
       user-select: none;
     }
-
     .btn-sub {
       background-color: #727272;
       color: #fff;
@@ -90,18 +78,15 @@
       cursor: pointer;
       font-weight: bold;
     }
-
     .btn-gold { background-color: #c6a100; color: #000; }
     .btn-green { background-color: #4a7c29; }
     .btn-danger { background-color: #a82a2a; }
-
     .task-item {
       background: #211c18;
       border: 2px solid #494038;
       padding: 12px;
       margin-bottom: 12px;
     }
-
     .history-item {
       background: #1a1714;
       border: 1px solid #4a7c29;
@@ -112,7 +97,6 @@
       display: flex;
       justify-content: space-between;
     }
-
     .answer-panel {
       display: none;
       background: #25201b;
@@ -121,7 +105,6 @@
       margin-top: 10px;
       text-align: center;
     }
-
     .answer-kanji {
       font-size: 52px;
       color: #fdf55f;
@@ -135,27 +118,27 @@
   <!-- ヘッダー -->
   <div class="header-bar">
     <div>⛏️ LEVEL: <span style="color:#fdf55f;">1</span></div>
-    <div>🔥 頑張った日数: <span style="color:#4cedd9;">11日</span></div>
+    <div>🔥 頑張った日数: <span style="color:#4cedd9;">10日</span></div>
   </div>
 
   <!-- トップ画面 -->
-  <div class="card" id="select-card">
+  <div class="card" id="select-card" style="display:block;">
     <h3 style="color:#fdf55f; margin:0 0 12px 0;">📜 今日のドリルを選ぼう！</h3>
     
     <div>
-      <!-- 11/11（本日分：写真全範囲の10問） -->
+      <!-- 11/11（本日分：10問） -->
       <div class="task-item">
         <div style="font-size:18px; margin-bottom:6px;">📅 <strong>2026-11-11 のドリル（10問）</strong></div>
-        <button type="button" class="btn-action" onclick="startDrill('2026-11-11')">▶ 挑戦する（スタート）</button>
+        <button type="button" class="btn-action" onclick="startDrill('2026-11-11')">▶ 挑戦する（11/11分）</button>
       </div>
 
-      <!-- 11/10（完了済み） -->
+      <!-- 11/10（再挑戦用） -->
       <div class="task-item">
-        <div>📅 <strong>2026-11-10 のドリル</strong></div>
-        <div style="color:#aaa; font-weight:bold;">✅ 完了済み (10/10正解)</div>
+        <div style="font-size:18px; margin-bottom:6px;">📅 <strong>2026-11-10 のドリル（10問）</strong></div>
+        <button type="button" class="btn-action" style="background-color:#c6a100; color:#000;" onclick="startDrill('2026-11-10')">▶ 挑戦する（11/10分）</button>
       </div>
 
-      <!-- 11/09（完了済み） -->
+      <!-- 過去の完了分 -->
       <div class="task-item">
         <div>📅 <strong>2026-11-09 のドリル</strong></div>
         <div style="color:#aaa; font-weight:bold;">✅ 完了済み (12/12正解)</div>
@@ -179,12 +162,12 @@
       <!-- 未実施分 -->
       <div class="task-item">
         <div style="font-size:18px; margin-bottom:6px;">📅 <strong>2026-11-04 のドリル（未実施）</strong></div>
-        <button type="button" class="btn-action" style="background-color:#c6a100; color:#000;" onclick="startDrill('2026-11-04')">▶ 挑戦する（11/4分）</button>
+        <button type="button" class="btn-action" style="background-color:#727272;" onclick="startDrill('2026-11-04')">▶ 挑戦する（11/4分）</button>
       </div>
 
       <div class="task-item">
         <div style="font-size:18px; margin-bottom:6px;">📅 <strong>2026-11-03 のドリル（未実施）</strong></div>
-        <button type="button" class="btn-action" style="background-color:#c6a100; color:#000;" onclick="startDrill('2026-11-03')">▶ 挑戦する（11/3分）</button>
+        <button type="button" class="btn-action" style="background-color:#727272;" onclick="startDrill('2026-11-03')">▶ 挑戦する（11/3分）</button>
       </div>
 
       <div class="task-item">
@@ -207,7 +190,6 @@
 
     <h4 style="color:#4cedd9; margin:0 0 8px 0;">🏆 クリアした日の記録（スタンプ帳）</h4>
     <div>
-      <div class="history-item"><span>✅ 2026-11-10 ドリル達成！</span><span>💎 CLEAR</span></div>
       <div class="history-item"><span>✅ 2026-11-09 ドリル達成！</span><span>💎 CLEAR</span></div>
       <div class="history-item"><span>✅ 2026-11-07 ドリル達成！</span><span>💎 CLEAR</span></div>
       <div class="history-item"><span>✅ 2026-11-06 ドリル達成！</span><span>💎 CLEAR</span></div>
@@ -261,7 +243,6 @@
 <script>
 var GOOGLE_SHEET_URL = "https://script.google.com/macros/s/AKfycbyU9y0O5XWXg9QJZ8FvzgY9iV0HTA1pwe7fydhLA8iCHPCYfzJtPkmupEZwK24NZBsW/exec";
 
-// 写真全範囲（写真24・23・19・20・21）からの新出10問
 var QUESTIONS_1111 = [
   { grade: 4, sentence: "(カイテイ)トンネルを通って移動する。", target: "カイテイ", answer: "海底", reading: "かいてい" },
   { grade: 4, sentence: "信用を(ウシナ)わないように約束を守る。", target: "ウシナ", answer: "失", reading: "うしなう" },
@@ -273,6 +254,19 @@ var QUESTIONS_1111 = [
   { grade: 4, sentence: "ワールドの(アタリ)をくまなく探検する。", target: "アタリ", answer: "辺", reading: "あたり" },
   { grade: 4, sentence: "(ガンタン)の初日の出を拠点から見る。", target: "ガンタン", answer: "元旦", reading: "がんたん" },
   { grade: 4, sentence: "自然の(サイガイ)に備えて拠点を強化する。", target: "サイガイ", answer: "災害", reading: "さいがい" }
+];
+
+var QUESTIONS_1110 = [
+  { grade: 4, sentence: "拠点の(ミギガワ)にチェストを置く。", target: "ミギガワ", answer: "右側", reading: "みぎがわ" },
+  { grade: 4, sentence: "(ムリ)な冒険をして全ロストしないように注意する。", target: "ムリ", answer: "無理", reading: "むり" },
+  { grade: 4, sentence: "(ホウカゴ)にマルチプレイの練習をする。", target: "ホウカゴ", answer: "放課後", reading: "ほうかご" },
+  { grade: 4, sentence: "ネザーの危険を(フセ)ぐ防具を装備する。", target: "フセ", answer: "防", reading: "ふせぐ" },
+  { grade: 4, sentence: "ゾンビの(ハンタイ)の向きへ走って逃げる。", target: "ハンタイ", answer: "反対", reading: "はんたい" },
+  { grade: 4, sentence: "(ゴウウ)の嵐が去るのをベッドで待つ。", target: "ゴウウ", answer: "豪雨", reading: "ごうう" },
+  { grade: 4, sentence: "拠点の周りに(サク)を立てて安全にする。", target: "サク", answer: "策", reading: "さく" },
+  { grade: 4, sentence: "回路の設計図を(ショウジキ)に見せる。", target: "ショウジキ", answer: "正直", reading: "しょうじき" },
+  { grade: 4, sentence: "拠点の敷地をぐるりと(イッシュウ)探検する。", target: "イッシュウ", answer: "一周", reading: "いっしゅう" },
+  { grade: 4, sentence: "クリーパーによる(ガイ)を防ぐ罠を作る。", target: "ガイ", answer: "害", reading: "がい" }
 ];
 
 var QUESTIONS_1104 = [
@@ -304,6 +298,7 @@ function startDrill(dStr) {
   activeLogs = [];
 
   if (dStr === '2026-11-11') activeList = QUESTIONS_1111;
+  else if (dStr === '2026-11-10') activeList = QUESTIONS_1110;
   else if (dStr === '2026-11-04') activeList = QUESTIONS_1104;
   else if (dStr === '2026-11-03') activeList = QUESTIONS_1103;
 
@@ -391,7 +386,7 @@ function postDataToSheet() {
   });
 }
 
-// キャンバス描画処理
+// キャンバス描画機能
 var cvsNode = null;
 var cvsCtx = null;
 var isPenDown = false;
@@ -437,4 +432,28 @@ function onPenStart(e) {
 }
 
 function onPenMove(e) {
-  if (!isPenDown
+  if (!isPenDown || !cvsCtx || !cvsNode) return;
+  var r = cvsNode.getBoundingClientRect();
+  cvsCtx.lineTo(e.clientX - r.left, e.clientY - r.top);
+  cvsCtx.stroke();
+}
+
+function onPenEnd() { isPenDown = false; }
+
+function clearCanvas() {
+  if (!cvsNode || !cvsCtx) setupCanvas();
+  if (!cvsNode || !cvsCtx) return;
+  try {
+    cvsCtx.clearRect(0, 0, cvsNode.width, cvsNode.height);
+    cvsCtx.strokeStyle = '#e0e0e0';
+    cvsCtx.lineWidth = 1;
+    cvsCtx.beginPath();
+    cvsCtx.moveTo(160, 0); 
+    cvsCtx.lineTo(160, 160);
+    cvsCtx.stroke();
+  } catch(err) {}
+}
+</script>
+
+</body>
+</html>
