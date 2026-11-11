@@ -20,6 +20,7 @@
       background-color: #312b26;
       border: 4px solid #191613;
       padding: 16px;
+      box-sizing: border-box;
     }
     .header-bar {
       display: flex;
@@ -55,6 +56,9 @@
       touch-action: none;
       border-radius: 4px;
     }
+    button {
+      touch-action: manipulation;
+    }
     .btn-action {
       background-color: #4a7c29;
       color: #ffffff;
@@ -67,7 +71,6 @@
       margin-top: 8px;
       display: block;
       text-align: center;
-      -webkit-tap-highlight-color: rgba(0,0,0,0);
       user-select: none;
     }
     .btn-sub {
@@ -129,7 +132,7 @@
       <!-- 11/11（本日分：写真全範囲の新10問） -->
       <div class="task-item">
         <div style="font-size:18px; margin-bottom:6px;">📅 <strong>2026-11-11 のドリル（10問）</strong></div>
-        <button type="button" class="btn-action" onclick="startDrillNow('2026-11-11');">▶ 挑戦する（スタート）</button>
+        <button type="button" class="btn-action" id="btn-start-1111">▶ 挑戦する（スタート）</button>
       </div>
 
       <!-- 11/10（完了済み） -->
@@ -162,74 +165,9 @@
       <!-- 未実施分 -->
       <div class="task-item">
         <div style="font-size:18px; margin-bottom:6px;">📅 <strong>2026-11-04 のドリル（未実施）</strong></div>
-        <button type="button" class="btn-action" style="background-color:#c6a100; color:#000;" onclick="startDrillNow('2026-11-04');">▶ 挑戦する（11/4分）</button>
+        <button type="button" class="btn-action" style="background-color:#c6a100; color:#000;" id="btn-start-1104">▶ 挑戦する（11/4分）</button>
       </div>
 
       <div class="task-item">
         <div style="font-size:18px; margin-bottom:6px;">📅 <strong>2026-11-03 のドリル（未実施）</strong></div>
-        <button type="button" class="btn-action" style="background-color:#c6a100; color:#000;" onclick="startDrillNow('2026-11-03');">▶ 挑戦する（11/3分）</button>
-      </div>
-
-      <div class="task-item">
-        <div>📅 <strong>2026-11-02 のドリル</strong></div>
-        <div style="color:#aaa; font-weight:bold;">✅ 完了済み (2/10正解)</div>
-      </div>
-
-      <div class="task-item">
-        <div>📅 <strong>2026-11-01 のドリル</strong></div>
-        <div style="color:#aaa; font-weight:bold;">✅ 完了済み (1/10正解)</div>
-      </div>
-
-      <div class="task-item">
-        <div>📅 <strong>2026-10-31 のドリル</strong></div>
-        <div style="color:#aaa; font-weight:bold;">✅ 完了済み (3/10正解)</div>
-      </div>
-    </div>
-
-    <hr style="border-color:#494038; margin:16px 0 12px 0;">
-
-    <h4 style="color:#4cedd9; margin:0 0 8px 0;">🏆 クリアした日の記録（スタンプ帳）</h4>
-    <div>
-      <div class="history-item"><span>✅ 2026-11-10 ドリル達成！</span><span>💎 CLEAR</span></div>
-      <div class="history-item"><span>✅ 2026-11-09 ドリル達成！</span><span>💎 CLEAR</span></div>
-      <div class="history-item"><span>✅ 2026-11-07 ドリル達成！</span><span>💎 CLEAR</span></div>
-      <div class="history-item"><span>✅ 2026-11-06 ドリル達成！</span><span>💎 CLEAR</span></div>
-      <div class="history-item"><span>✅ 2026-11-05 ドリル達成！</span><span>💎 CLEAR</span></div>
-      <div class="history-item"><span>✅ 2026-11-02 ドリル達成！</span><span>💎 CLEAR</span></div>
-      <div class="history-item"><span>✅ 2026-11-01 ドリル達成！</span><span>💎 CLEAR</span></div>
-      <div class="history-item"><span>✅ 2026-10-31 ドリル達成！</span><span>💎 CLEAR</span></div>
-    </div>
-  </div>
-
-  <!-- 問題カード -->
-  <div class="card" id="main-card" style="display:none;">
-    <div style="display:flex; justify-content:space-between; align-items:center;">
-      <button type="button" class="btn-sub" onclick="showMenu();">🔙 一覧へ</button>
-      <span id="q-number">第 1 問</span>
-    </div>
-
-    <div class="question-box" id="q-sentence"></div>
-
-    <!-- キャンバス -->
-    <div style="text-align:center; margin:10px 0;">
-      <canvas id="handwrite-canvas" width="320" height="160"></canvas>
-      <div style="margin-top:12px; display:flex; justify-content:center; gap:12px;">
-        <button type="button" class="btn-sub" onclick="clearCanvas();">🧼 けす</button>
-        <button type="button" class="btn-sub btn-gold" id="btn-check" onclick="showAnswer();">🔍 答えあわせ</button>
-      </div>
-    </div>
-
-    <!-- 答えあわせ -->
-    <div class="answer-panel" id="answer-panel">
-      <div>正解（せいかい）:</div>
-      <div class="answer-kanji" id="ans-kanji">海底</div>
-      <div id="ans-reading" style="font-size:14px; color:#ccc; margin-bottom:8px;"></div>
-      <div style="display:flex; justify-content:center; gap:12px;">
-        <button type="button" class="btn-sub btn-green" onclick="evaluateResult(true);">⭕ 書けた！</button>
-        <button type="button" class="btn-sub btn-danger" onclick="evaluateResult(false);">❌ 書けなかった</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- クリア画面 -->
-  <div class="card" id="clear-card
+        <button type="button" class="btn-action" style="background-color:#c6a100; color
