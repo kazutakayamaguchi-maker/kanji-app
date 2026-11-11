@@ -2,9 +2,14 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>マイクラ風 漢字ドリル</title>
   <style>
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
     body {
       margin: 0;
       padding: 16px;
@@ -14,14 +19,15 @@
       display: flex;
       justify-content: center;
     }
+
     .app-container {
       width: 100%;
       max-width: 600px;
       background-color: #312b26;
       border: 4px solid #191613;
       padding: 16px;
-      box-sizing: border-box;
     }
+
     .header-bar {
       display: flex;
       justify-content: space-between;
@@ -31,12 +37,14 @@
       margin-bottom: 16px;
       font-weight: bold;
     }
+
     .card {
       background-color: #3b352f;
       border: 3px solid #191613;
       padding: 16px;
       margin-bottom: 12px;
     }
+
     .question-box {
       font-size: 20px;
       line-height: 1.6;
@@ -45,20 +53,20 @@
       padding: 12px;
       border: 2px solid #1a1714;
     }
+
     .target-word {
       color: #fdf55f;
       border-bottom: 3px dashed #fdf55f;
       font-weight: bold;
     }
+
     canvas {
       background: #ffffff;
       border: 4px solid #866043;
       touch-action: none;
       border-radius: 4px;
     }
-    button {
-      touch-action: manipulation;
-    }
+
     .btn-action {
       background-color: #4a7c29;
       color: #ffffff;
@@ -73,23 +81,27 @@
       text-align: center;
       user-select: none;
     }
+
     .btn-sub {
       background-color: #727272;
       color: #fff;
-      padding: 8px 16px;
+      padding: 10px 18px;
       border: 2px solid #000;
       cursor: pointer;
       font-weight: bold;
     }
+
     .btn-gold { background-color: #c6a100; color: #000; }
     .btn-green { background-color: #4a7c29; }
     .btn-danger { background-color: #a82a2a; }
+
     .task-item {
       background: #211c18;
       border: 2px solid #494038;
       padding: 12px;
       margin-bottom: 12px;
     }
+
     .history-item {
       background: #1a1714;
       border: 1px solid #4a7c29;
@@ -100,6 +112,7 @@
       display: flex;
       justify-content: space-between;
     }
+
     .answer-panel {
       display: none;
       background: #25201b;
@@ -108,6 +121,7 @@
       margin-top: 10px;
       text-align: center;
     }
+
     .answer-kanji {
       font-size: 52px;
       color: #fdf55f;
@@ -121,7 +135,7 @@
   <!-- ヘッダー -->
   <div class="header-bar">
     <div>⛏️ LEVEL: <span style="color:#fdf55f;">1</span></div>
-    <div>🔥 頑張った日数: <span style="color:#4cedd9;">10日</span></div>
+    <div>🔥 頑張った日数: <span style="color:#4cedd9;">11日</span></div>
   </div>
 
   <!-- トップ画面 -->
@@ -129,10 +143,10 @@
     <h3 style="color:#fdf55f; margin:0 0 12px 0;">📜 今日のドリルを選ぼう！</h3>
     
     <div>
-      <!-- 11/11（本日分：写真全範囲の新10問） -->
+      <!-- 11/11（本日分：写真全範囲の10問） -->
       <div class="task-item">
         <div style="font-size:18px; margin-bottom:6px;">📅 <strong>2026-11-11 のドリル（10問）</strong></div>
-        <button type="button" class="btn-action" id="btn-start-1111">▶ 挑戦する（スタート）</button>
+        <button type="button" class="btn-action" onclick="startDrill('2026-11-11')">▶ 挑戦する（スタート）</button>
       </div>
 
       <!-- 11/10（完了済み） -->
@@ -141,7 +155,7 @@
         <div style="color:#aaa; font-weight:bold;">✅ 完了済み (10/10正解)</div>
       </div>
 
-      <!-- 過去の完了分 -->
+      <!-- 11/09（完了済み） -->
       <div class="task-item">
         <div>📅 <strong>2026-11-09 のドリル</strong></div>
         <div style="color:#aaa; font-weight:bold;">✅ 完了済み (12/12正解)</div>
@@ -149,7 +163,7 @@
 
       <div class="task-item">
         <div>📅 <strong>2026-11-07 のドリル</strong></div>
-        <div style="color:#aaa; font-weight:bold;">✅ 完了済み (12/12正解)</div>
+        <div style="color:#aaa; font-weight:bold;">✅ 完了済み (9/12正解)</div>
       </div>
 
       <div class="task-item">
@@ -165,9 +179,262 @@
       <!-- 未実施分 -->
       <div class="task-item">
         <div style="font-size:18px; margin-bottom:6px;">📅 <strong>2026-11-04 のドリル（未実施）</strong></div>
-        <button type="button" class="btn-action" style="background-color:#c6a100; color:#000;" id="btn-start-1104">▶ 挑戦する（11/4分）</button>
+        <button type="button" class="btn-action" style="background-color:#c6a100; color:#000;" onclick="startDrill('2026-11-04')">▶ 挑戦する（11/4分）</button>
       </div>
 
       <div class="task-item">
         <div style="font-size:18px; margin-bottom:6px;">📅 <strong>2026-11-03 のドリル（未実施）</strong></div>
-        <button type="button" class="btn-action" style="background-color:#c6a100; color
+        <button type="button" class="btn-action" style="background-color:#c6a100; color:#000;" onclick="startDrill('2026-11-03')">▶ 挑戦する（11/3分）</button>
+      </div>
+
+      <div class="task-item">
+        <div>📅 <strong>2026-11-02 のドリル</strong></div>
+        <div style="color:#aaa; font-weight:bold;">✅ 完了済み (2/10正解)</div>
+      </div>
+
+      <div class="task-item">
+        <div>📅 <strong>2026-11-01 のドリル</strong></div>
+        <div style="color:#aaa; font-weight:bold;">✅ 完了済み (1/10正解)</div>
+      </div>
+
+      <div class="task-item">
+        <div>📅 <strong>2026-10-31 のドリル</strong></div>
+        <div style="color:#aaa; font-weight:bold;">✅ 完了済み (3/10正解)</div>
+      </div>
+    </div>
+
+    <hr style="border-color:#494038; margin:16px 0 12px 0;">
+
+    <h4 style="color:#4cedd9; margin:0 0 8px 0;">🏆 クリアした日の記録（スタンプ帳）</h4>
+    <div>
+      <div class="history-item"><span>✅ 2026-11-10 ドリル達成！</span><span>💎 CLEAR</span></div>
+      <div class="history-item"><span>✅ 2026-11-09 ドリル達成！</span><span>💎 CLEAR</span></div>
+      <div class="history-item"><span>✅ 2026-11-07 ドリル達成！</span><span>💎 CLEAR</span></div>
+      <div class="history-item"><span>✅ 2026-11-06 ドリル達成！</span><span>💎 CLEAR</span></div>
+      <div class="history-item"><span>✅ 2026-11-05 ドリル達成！</span><span>💎 CLEAR</span></div>
+      <div class="history-item"><span>✅ 2026-11-02 ドリル達成！</span><span>💎 CLEAR</span></div>
+      <div class="history-item"><span>✅ 2026-11-01 ドリル達成！</span><span>💎 CLEAR</span></div>
+      <div class="history-item"><span>✅ 2026-10-31 ドリル達成！</span><span>💎 CLEAR</span></div>
+    </div>
+  </div>
+
+  <!-- 問題カード -->
+  <div class="card" id="main-card" style="display:none;">
+    <div style="display:flex; justify-content:space-between; align-items:center;">
+      <button type="button" class="btn-sub" onclick="showMenu()">🔙 一覧へ</button>
+      <span id="q-number">第 1 問</span>
+    </div>
+
+    <div class="question-box" id="q-sentence"></div>
+
+    <!-- キャンバス -->
+    <div style="text-align:center; margin:10px 0;">
+      <canvas id="handwrite-canvas" width="320" height="160"></canvas>
+      <div style="margin-top:12px; display:flex; justify-content:center; gap:12px;">
+        <button type="button" class="btn-sub" onclick="clearCanvas()">🧼 けす</button>
+        <button type="button" class="btn-sub btn-gold" id="btn-check" onclick="showAnswer()">🔍 答えあわせ</button>
+      </div>
+    </div>
+
+    <!-- 答えあわせ -->
+    <div class="answer-panel" id="answer-panel">
+      <div>正解（せいかい）:</div>
+      <div class="answer-kanji" id="ans-kanji">海底</div>
+      <div id="ans-reading" style="font-size:14px; color:#ccc; margin-bottom:8px;"></div>
+      <div style="display:flex; justify-content:center; gap:12px;">
+        <button type="button" class="btn-sub btn-green" onclick="evaluateResult(true)">⭕ 書けた！</button>
+        <button type="button" class="btn-sub btn-danger" onclick="evaluateResult(false)">❌ 書けなかった</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- クリア画面 -->
+  <div class="card" id="clear-card" style="display:none; text-align:center;">
+    <h2 style="color:#fdf55f;">🎉 クリアおめでとう！</h2>
+    <p id="clear-date-text"></p>
+    <div style="font-size:48px; margin:16px 0;">💎</div>
+    <p id="send-status" style="font-size:12px; color:#4cedd9;"></p>
+    <button type="button" class="btn-sub btn-green" onclick="showMenu()">ドリル一覧にもどる</button>
+  </div>
+</div>
+
+<script>
+var GOOGLE_SHEET_URL = "https://script.google.com/macros/s/AKfycbyU9y0O5XWXg9QJZ8FvzgY9iV0HTA1pwe7fydhLA8iCHPCYfzJtPkmupEZwK24NZBsW/exec";
+
+// 写真全範囲（写真24・23・19・20・21）からの新出10問
+var QUESTIONS_1111 = [
+  { grade: 4, sentence: "(カイテイ)トンネルを通って移動する。", target: "カイテイ", answer: "海底", reading: "かいてい" },
+  { grade: 4, sentence: "信用を(ウシナ)わないように約束を守る。", target: "ウシナ", answer: "失", reading: "うしなう" },
+  { grade: 4, sentence: "冒険の目標や(キボウ)を胸に抱く。", target: "キボウ", answer: "希望", reading: "きぼう" },
+  { grade: 4, sentence: "仲間と(キョウツウ)の拠点を作る。", target: "キョウツウ", answer: "共通", reading: "きょうつう" },
+  { grade: 4, sentence: "ネザー要塞へトロッコが(ツラ)なる。", target: "ツラ", answer: "連", reading: "つらなる" },
+  { grade: 4, sentence: "敵の攻撃で勝敗が(ケッ)する。", target: "ケッ", answer: "決", reading: "けっする" },
+  { grade: 4, sentence: "拠点の壁の高さを(ヒク)く抑える。", target: "ヒク", answer: "低", reading: "ひくく" },
+  { grade: 4, sentence: "ワールドの(アタリ)をくまなく探検する。", target: "アタリ", answer: "辺", reading: "あたり" },
+  { grade: 4, sentence: "(ガンタン)の初日の出を拠点から見る。", target: "ガンタン", answer: "元旦", reading: "がんたん" },
+  { grade: 4, sentence: "自然の(サイガイ)に備えて拠点を強化する。", target: "サイガイ", answer: "災害", reading: "さいがい" }
+];
+
+var QUESTIONS_1104 = [
+  { grade: 4, sentence: "交易のために村人と(ヤクソク)を交わす。", target: "ヤクソク", answer: "約束", reading: "やくそく" },
+  { grade: 4, sentence: "ダイヤモンドの剣を(アイヨウ)する。", target: "アイヨウ", answer: "愛用", reading: "あいよう" },
+  { grade: 4, sentence: "遠くの村までエリトラで(ヒコウ)する。", target: "ヒコウ", answer: "飛行", reading: "ひこう" },
+  { grade: 4, sentence: "自動農園の仕組みを(カンセイ)させる。", target: "カンセイ", answer: "完成", reading: "かんせい" },
+  { grade: 4, sentence: "ダイヤの防具で防御を(カタ)める。", target: "カタ", answer: "固", reading: "かためる" }
+];
+
+var QUESTIONS_1103 = [
+  { grade: 3, sentence: "ネザー要塞でブレイズの(イノチ)をねらう。", target: "イノチ", answer: "命", reading: "いのち" },
+  { grade: 4, sentence: "(ユウキ)を出してエンドドラゴンに挑む。", target: "ユウキ", answer: "勇気", reading: "ゆうき" },
+  { grade: 4, sentence: "不要なアイテムをエメラルドに(ヘンカン)する。", target: "ヘンカン", answer: "変換", reading: "へんかん" },
+  { grade: 4, sentence: "仲間の作業を(テツダ)う。", target: "テツダ", answer: "手伝", reading: "てつだう" },
+  { grade: 3, sentence: "クリーパーの爆発から(シナモノ)を守る。", target: "シナモノ", answer: "品物", reading: "しなもの" }
+];
+
+var activeDateStr = "";
+var activeList = [];
+var activeIndex = 0;
+var activeCorrects = 0;
+var activeLogs = [];
+
+function startDrill(dStr) {
+  activeDateStr = dStr;
+  activeIndex = 0;
+  activeCorrects = 0;
+  activeLogs = [];
+
+  if (dStr === '2026-11-11') activeList = QUESTIONS_1111;
+  else if (dStr === '2026-11-04') activeList = QUESTIONS_1104;
+  else if (dStr === '2026-11-03') activeList = QUESTIONS_1103;
+
+  document.getElementById('select-card').style.display = 'none';
+  document.getElementById('clear-card').style.display = 'none';
+  document.getElementById('main-card').style.display = 'block';
+
+  renderCurrentCard();
+}
+
+function showMenu() {
+  document.getElementById('main-card').style.display = 'none';
+  document.getElementById('clear-card').style.display = 'none';
+  document.getElementById('select-card').style.display = 'block';
+}
+
+function renderCurrentCard() {
+  if (!activeList || activeList.length === 0) return;
+
+  if (activeIndex >= activeList.length) {
+    completeSession();
+    return;
+  }
+
+  var cur = activeList[activeIndex];
+  document.getElementById('q-number').innerText = '第 ' + (activeIndex + 1) + ' / ' + activeList.length + ' 問';
+  document.getElementById('q-sentence').innerHTML = cur.sentence.replace(/\((.*?)\)/, '<span class="target-word">$1</span>');
+  document.getElementById('answer-panel').style.display = 'none';
+  document.getElementById('btn-check').style.display = 'inline-block';
+
+  clearCanvas();
+}
+
+function showAnswer() {
+  if (!activeList || !activeList[activeIndex]) return;
+  var cur = activeList[activeIndex];
+  document.getElementById('ans-kanji').innerText = cur.answer;
+  document.getElementById('ans-reading').innerText = 'よみ: ' + cur.reading;
+  document.getElementById('answer-panel').style.display = 'block';
+  document.getElementById('btn-check').style.display = 'none';
+}
+
+function evaluateResult(ok) {
+  if (!activeList || !activeList[activeIndex]) return;
+  var cur = activeList[activeIndex];
+  var n = activeIndex + 1;
+  
+  if (ok) {
+    activeCorrects++;
+    activeLogs.push(n + '問目: [小' + cur.grade + '] ' + cur.sentence + ' | 正解: ' + cur.answer + ' | 結果: ⭕正解');
+  } else {
+    activeLogs.push(n + '問目: [小' + cur.grade + '] ' + cur.sentence + ' | 正解: ' + cur.answer + ' | 結果: ❌不正解');
+  }
+  activeIndex++;
+  renderCurrentCard();
+}
+
+function completeSession() {
+  document.getElementById('main-card').style.display = 'none';
+  document.getElementById('clear-card').style.display = 'block';
+  document.getElementById('clear-date-text').innerText = activeDateStr + ' のドリル完了！';
+  postDataToSheet();
+}
+
+function postDataToSheet() {
+  var st = document.getElementById('send-status');
+  if (st) st.innerText = "詳細な学習記録を送信中...";
+  
+  var p = {
+    dateStr: activeDateStr,
+    score: activeCorrects,
+    total: activeList.length,
+    details: activeLogs
+  };
+
+  fetch(GOOGLE_SHEET_URL, {
+    method: 'POST',
+    mode: 'no-cors',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(p)
+  }).then(function() {
+    if (st) st.innerText = "✅ スプレッドシートへ詳細記録を送信完了！";
+  }).catch(function() {
+    if (st) st.innerText = "⚠️ 送信できませんでした。";
+  });
+}
+
+// キャンバス描画処理
+var cvsNode = null;
+var cvsCtx = null;
+var isPenDown = false;
+
+function setupCanvas() {
+  cvsNode = document.getElementById('handwrite-canvas');
+  if (!cvsNode) return;
+  cvsCtx = cvsNode.getContext('2d');
+
+  cvsNode.onmousedown = onPenStart;
+  cvsNode.onmousemove = onPenMove;
+  cvsNode.onmouseup = onPenEnd;
+
+  cvsNode.ontouchstart = function(e) {
+    if (e && e.touches && e.touches[0]) {
+      onPenStart({ clientX: e.touches[0].clientX, clientY: e.touches[0].clientY });
+    }
+  };
+  
+  cvsNode.ontouchmove = function(e) {
+    if (e && e.touches && e.touches[0]) {
+      onPenMove({ clientX: e.touches[0].clientX, clientY: e.touches[0].clientY });
+    }
+  };
+  
+  cvsNode.ontouchend = onPenEnd;
+}
+
+window.onload = function() {
+  setupCanvas();
+};
+
+function onPenStart(e) {
+  if (!cvsCtx || !cvsNode) setupCanvas();
+  if (!cvsCtx || !cvsNode) return;
+  isPenDown = true;
+  cvsCtx.beginPath();
+  var r = cvsNode.getBoundingClientRect();
+  cvsCtx.moveTo(e.clientX - r.left, e.clientY - r.top);
+  cvsCtx.lineWidth = 6;
+  cvsCtx.lineCap = 'round';
+  cvsCtx.strokeStyle = '#222';
+}
+
+function onPenMove(e) {
+  if (!isPenDown
