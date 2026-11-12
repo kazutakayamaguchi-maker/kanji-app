@@ -121,7 +121,7 @@
   <!-- ヘッダー -->
   <div class="header-bar">
     <div>⛏️ LEVEL: <span style="color:#fdf55f;">1</span></div>
-    <div>🔥 頑張った日数: <span style="color:#4cedd9;">11日</span></div>
+    <div>🔥 頑張った日数: <span style="color:#4cedd9;">12日</span></div>
   </div>
 
   <!-- トップ画面 -->
@@ -129,10 +129,16 @@
     <h3 style="color:#fdf55f; margin:0 0 12px 0;">📜 今日のドリルを選ぼう！</h3>
     
     <div>
-      <!-- 11/11（本日分：10問） -->
+      <!-- 11/12（本日分：新10問） -->
+      <div class="task-item">
+        <div style="font-size:18px; margin-bottom:6px;">📅 <strong>2026-11-12 のドリル（10問）</strong></div>
+        <button type="button" class="btn-action" onclick="startDrill('2026-11-12')">▶ 挑戦する（11/12分）</button>
+      </div>
+
+      <!-- 11/11（前日分：10問） -->
       <div class="task-item">
         <div style="font-size:18px; margin-bottom:6px;">📅 <strong>2026-11-11 のドリル（10問）</strong></div>
-        <button type="button" class="btn-action" onclick="startDrill('2026-11-11')">▶ 挑戦する（11/11分）</button>
+        <button type="button" class="btn-action" style="background-color:#c6a100; color:#000;" onclick="startDrill('2026-11-11')">▶ 挑戦する（11/11分）</button>
       </div>
 
       <!-- 11/10（完了済み固定） -->
@@ -225,7 +231,7 @@
     <!-- 答えあわせ -->
     <div class="answer-panel" id="answer-panel">
       <div>正解（せいかい）:</div>
-      <div class="answer-kanji" id="ans-kanji">海底</div>
+      <div class="answer-kanji" id="ans-kanji">老木</div>
       <div id="ans-reading" style="font-size:14px; color:#ccc; margin-bottom:8px;"></div>
       <div style="display:flex; justify-content:center; gap:12px;">
         <button type="button" class="btn-sub btn-green" onclick="evaluateResult(true)">⭕ 書けた！</button>
@@ -239,13 +245,29 @@
     <h2 style="color:#fdf55f;">🎉 クリアおめでとう！</h2>
     <p id="clear-date-text"></p>
     <div style="font-size:48px; margin:16px 0;">💎</div>
-    <p id="send-status" style="font-size:12px; color:#4cedd9;"></p>
-    <button type="button" class="btn-sub btn-green" onclick="showMenu()">ドリル一覧にもどる</button>
+    <p id="send-status" style="font-size:13px; color:#4cedd9; font-weight:bold;"></p>
+    <div style="margin-top:14px; display:flex; flex-direction:column; gap:10px; align-items:center;">
+      <button type="button" class="btn-sub btn-gold" id="btn-resend" onclick="postDataToSheet()" style="display:none;">🔄 記録を再送信する</button>
+      <button type="button" class="btn-sub btn-green" onclick="showMenu()">ドリル一覧にもどる</button>
+    </div>
   </div>
 </div>
 
 <script>
 var GOOGLE_SHEET_URL = "https://script.google.com/macros/s/AKfycbyU9y0O5XWXg9QJZ8FvzgY9iV0HTA1pwe7fydhLA8iCHPCYfzJtPkmupEZwK24NZBsW/exec";
+
+var QUESTIONS_1112 = [
+  { grade: 4, sentence: "松の(ロウボク)が生い茂る森を探検する。", target: "ロウボク", answer: "老木", reading: "ろうぼく" },
+  { grade: 4, sentence: "ボス戦の(ショウハイ)は装備の準備で決まる。", target: "ショウハイ", answer: "勝敗", reading: "しょうはい" },
+  { grade: 4, sentence: "エンダードラゴン討伐の(ネガ)いがかなう。", target: "ネガ", answer: "願", reading: "ねがい" },
+  { grade: 4, sentence: "村の古いルールを(アラタ)めて使いやすくする。", target: "アラタ", answer: "改", reading: "あらためる" },
+  { grade: 4, sentence: "高い山から(テイチ)の村を見下ろす。", target: "テイチ", answer: "低地", reading: "ていち" },
+  { grade: 4, sentence: "マグマに落ちないように(アタマ)を冷やして考える。", target: "アタマ", answer: "頭", reading: "あたま" },
+  { grade: 4, sentence: "仲間を助けるための(ロウ)をおしまない。", target: "ロウ", answer: "労", reading: "ろう" },
+  { grade: 4, sentence: "自分のミスを深く(ハンセイ)して次に生かす。", target: "ハンセイ", answer: "反省", reading: "はんせい" },
+  { grade: 4, sentence: "大通りから一歩(ウチガワ)の建物に入る。", target: "ウチガワ", answer: "内側", reading: "うちがわ" },
+  { grade: 4, sentence: "(ブジ)に拠点まで帰還して宝箱を開ける。", target: "ブジ", answer: "無事", reading: "ぶじ" }
+];
 
 var QUESTIONS_1111 = [
   { grade: 4, sentence: "(カイテイ)トンネルを通って移動する。", target: "カイテイ", answer: "海底", reading: "かいてい" },
@@ -289,7 +311,8 @@ function startDrill(dStr) {
     activeCorrects = 0;
     activeLogs = [];
 
-    if (dStr === '2026-11-11') activeList = QUESTIONS_1111;
+    if (dStr === '2026-11-12') activeList = QUESTIONS_1112;
+    else if (dStr === '2026-11-11') activeList = QUESTIONS_1111;
     else if (dStr === '2026-11-04') activeList = QUESTIONS_1104;
     else if (dStr === '2026-11-03') activeList = QUESTIONS_1103;
 
@@ -303,7 +326,6 @@ function startDrill(dStr) {
 
     renderCurrentCard();
   } catch(e) {
-    // 万一エラーが出ても必ず画面切り替えを完了させる
     document.getElementById('select-card').style.display = 'none';
     document.getElementById('main-card').style.display = 'block';
   }
@@ -373,30 +395,43 @@ function evaluateResult(ok) {
 function completeSession() {
   document.getElementById('main-card').style.display = 'none';
   document.getElementById('clear-card').style.display = 'block';
-  document.getElementById('clear-date-text').innerText = activeDateStr + ' のドリル完了！';
+  document.getElementById('clear-date-text').innerText = activeDateStr + ' のドリル完了！（' + activeCorrects + ' / ' + activeList.length + ' 正解）';
   postDataToSheet();
 }
 
 function postDataToSheet() {
   var st = document.getElementById('send-status');
-  if (st) st.innerText = "詳細な学習記録を送信中...";
+  var resendBtn = document.getElementById('btn-resend');
+  if (st) st.innerText = "詳細な学習記録をスプレッドシートへ送信中...";
+  if (resendBtn) resendBtn.style.display = "none";
   
-  var p = {
+  var payloadStr = JSON.stringify({
     dateStr: activeDateStr,
     score: activeCorrects,
     total: activeList.length,
     details: activeLogs
-  };
+  });
+
+  var formBody = "payload=" + encodeURIComponent(payloadStr);
 
   fetch(GOOGLE_SHEET_URL, {
     method: 'POST',
     mode: 'no-cors',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(p)
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: formBody
   }).then(function() {
-    if (st) st.innerText = "✅ スプレッドシートへ詳細記録を送信完了！";
+    var img = new Image();
+    img.src = GOOGLE_SHEET_URL + "?dateStr=" + encodeURIComponent(activeDateStr) +
+              "&score=" + encodeURIComponent(activeCorrects) +
+              "&total=" + encodeURIComponent(activeList.length) +
+              "&details=" + encodeURIComponent(activeLogs.join("\n")) +
+              "&t=" + new Date().getTime();
+
+    if (st) st.innerText = "✅ スプレッドシートへ学習記録を送信しました！";
+    if (resendBtn) resendBtn.style.display = "inline-block";
   }).catch(function() {
-    if (st) st.innerText = "⚠️ 送信できませんでした。";
+    if (st) st.innerText = "⚠️ 通信エラーが発生しました。「再送信」を押してください。";
+    if (resendBtn) resendBtn.style.display = "inline-block";
   });
 }
 
